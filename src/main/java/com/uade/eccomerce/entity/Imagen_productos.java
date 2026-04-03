@@ -12,16 +12,18 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "orders")
-public class Order {
+@Table(name = "imagenes_productos")
+public class Imagen_productos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id_imagen;
 
-    @Column
-    private Long count;
+    @Column(nullable = false)
+    private String url;
+
+    // Relaciones
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "id_producto", nullable = false)
+    private Producto producto;
 }

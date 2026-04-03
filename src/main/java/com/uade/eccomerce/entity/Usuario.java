@@ -1,6 +1,6 @@
 package com.uade.eccomerce.entity;
 
-import java.util.Collection;
+import java.sql.Date;
 import java.util.List;
 
 // import org.springframework.security.core.GrantedAuthority;
@@ -14,41 +14,58 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Data
+@Table(name = "usuarios")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class User {  // implements UserDetails
+public class Usuario {  // implements UserDetails
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String email;
-
-    private String name;
-
-    private String password;
-
-    private String firstName;
+    private Long id_usuario;
 
     @Column(nullable = false, unique = true)
-    private String lastName;
+    private String username;
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String contrasena;
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Column(nullable = false)
+    private String apellido;
+
+    @Column(nullable = false)
+    private Boolean activo;
+    
+    @Column(nullable = false)
+    private Date fecha_creacion;
+
+    // Relaciones
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Pedido> pedidos;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Producto> productos;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Rol rol;
+
+    // Métodos de UserDetails para seguridad
 
     // @Override
     // public Collection<? extends GrantedAuthority> getAuthorities() {

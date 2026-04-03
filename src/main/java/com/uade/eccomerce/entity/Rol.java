@@ -1,5 +1,6 @@
 package com.uade.eccomerce.entity;
 
-public enum Role {
-    USER
+public enum Rol {
+    USER,
+    ADMIN
 }
