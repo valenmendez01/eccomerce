@@ -1,6 +1,6 @@
-# Proyecto-eccomerce_APIs
+# Proyecto-ecommerce_APIs
 
-## Para que funciona todo ok
+## Para que funcione todo ok
 * Crar schema en MySQLWorkbench --> marketplace
 * Crear archivo .env con lo necesario (tomar como referencia .env.example)
 
