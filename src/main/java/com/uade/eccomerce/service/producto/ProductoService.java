@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
 
@@ -14,7 +15,9 @@ public interface ProductoService {
 
     public Optional<Producto> getProductoById(Long id);
 
-    public Producto guardarProducto(Producto producto);
+    public Producto guardarProducto(ProductoRequest request);
+
+    public Producto actualizarProducto(Long id, ProductoRequest request);
 
     public void eliminarProducto(Long id);
 

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
+
+    // Listado de productos activos
+    Page<Producto> findByActivoTrue(PageRequest pageable);
     
     // Filtrar por categoría
     Page<Producto> findByCategoriaAndActivoTrue(Categoria categoria, PageRequest pageable);
