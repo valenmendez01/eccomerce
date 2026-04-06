@@ -1,5 +1,6 @@
 package com.uade.eccomerce.controllers.productos;
 
+import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.service.producto.ProductoService;
 
@@ -31,8 +32,8 @@ public class ProductoController {
 
     // Obtener un producto por ID (lo pasó la profe)
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable Long Id) {
-        Optional<Producto> result = productoService.getProductoById(Id);
+    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
+        Optional<Producto> result = productoService.getProductoById(id);
         if (result.isPresent())
             return ResponseEntity.ok(result.get());
 
@@ -41,32 +42,20 @@ public class ProductoController {
 
     // Crear un nuevo producto
     @PostMapping
-    public Producto crearProducto(@RequestBody Producto producto) {
-        return productoService.guardarProducto(producto);
+    public ResponseEntity<Producto> crearProducto(@RequestBody ProductoRequest request) {
+        Producto guardado = productoService.guardarProducto(request);
+        return ResponseEntity.ok(guardado);
     }
 
     // Actualizar un producto
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto detallesProducto) {
-
-        Optional<Producto> productoOptional = productoService.getProductoById(id);
-
-        if (productoOptional.isPresent()) {
-
-            Producto producto = productoOptional.get();
-
-            producto.setNombre(detallesProducto.getNombre());
-            producto.setDescription(detallesProducto.getDescription());
-            producto.setPrecio(detallesProducto.getPrecio());
-            producto.setStock(detallesProducto.getStock());
-            producto.setDescuento(detallesProducto.getDescuento());
-            producto.setCategoria(detallesProducto.getCategoria());
-
-            Producto actualizado = productoService.guardarProducto(producto);
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request) {
+        Producto actualizado = productoService.actualizarProducto(id, request);
+        
+        if (actualizado != null) {
             return ResponseEntity.ok(actualizado);
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 
     // Eliminar (desactivar) un producto
@@ -77,5 +66,45 @@ public class ProductoController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // Filtrar por Categoría
+    @GetMapping("/filtrar/{categoria}")
+    public ResponseEntity<Page<Producto>> getProductosByCategoria(
+            @PathVariable Categoria categoria,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        
+        if (page == null || size == null)
+            return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(0, Integer.MAX_VALUE)));
+        
+        return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(page, size)));
+    }
+
+    // Filtrar por Rango de Precio
+    @GetMapping("/filtrar/precio")
+    public ResponseEntity<Page<Producto>> getProductosByPrecio(
+            @RequestParam Double min,
+            @RequestParam Double max,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        
+        if (page == null || size == null)
+            return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(0, Integer.MAX_VALUE)));
+        
+        return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(page, size)));
+    }
+
+    // Buscar por Nombre
+    @GetMapping("/filtrar/nombre")
+    public ResponseEntity<Page<Producto>> getProductosByNombre(
+            @RequestParam String nombre,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        
+        if (page == null || size == null)
+            return ResponseEntity.ok(productoService.getProductosByNombre(nombre, PageRequest.of(0, Integer.MAX_VALUE)));
+        
+        return ResponseEntity.ok(productoService.getProductosByNombre(nombre, PageRequest.of(page, size)));
     }
 }
