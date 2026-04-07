@@ -9,8 +9,8 @@ import java.util.List;
 public interface ImagenRepository extends JpaRepository<Imagen_productos, Long> {
 
     // Útil para recuperar todas las fotos de un producto específico
-    List<Imagen_productos> findByProductoIdProducto(Long idProducto);
+    List<Imagen_productos> findByProductoIdproducto(Long id);
 
     // Útil si querés borrar todas las fotos de un producto antes de subir nuevas (en un Update)
-    void deleteByProductoIdProducto(Long idProducto);
+    void deleteByProductoIdproducto(Long idProducto);
 }

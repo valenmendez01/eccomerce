@@ -6,12 +6,14 @@ import java.sql.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import com.uade.eccomerce.controllers.usuarios.UsuarioRequest;
 import com.uade.eccomerce.controllers.usuarios.CambiarContraRequest;
 import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.repository.UsuarioRepository;
 
+@Service
 public class UsuarioServiceImp implements UsuarioService{
 
     @Autowired
@@ -29,7 +31,7 @@ public class UsuarioServiceImp implements UsuarioService{
 
     @Override
     public Optional<Usuario> getUsuarioByEmail(String email) {
-        return usuarioRepository.findByEmailAndActivo(email);
+        return usuarioRepository.findByEmail(email);
     }
 
     @Override
