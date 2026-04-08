@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.eccomerce.controllers.usuarios.UsuarioRequest;
 import com.uade.eccomerce.controllers.usuarios.CambiarContraRequest;
+import com.uade.eccomerce.entity.Rol;
 import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.repository.UsuarioRepository;
 
@@ -45,6 +46,7 @@ public class UsuarioServiceImp implements UsuarioService{
         u.setApellido(request.getApellido());
         u.setActivo(true);
         u.setFecha_creacion(new java.sql.Date(System.currentTimeMillis()));
+        u.setRol(Rol.COMPRADOR);
 
         return usuarioRepository.save(u);
     }
