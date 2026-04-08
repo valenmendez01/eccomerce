@@ -1,12 +1,17 @@
 package com.uade.eccomerce.controllers.productos;
 
 import com.uade.eccomerce.entity.Categoria;
+import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
+import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
+import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
+import com.uade.eccomerce.exceptions.productos.filtros.CategoriaInvalidaException;
+import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
+import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
+import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.service.producto.ProductoService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,52 +24,49 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // Obtener todos los productos paginados (lo pasó la profe)
+    // Obtener todos los productos paginados
     @GetMapping
     public ResponseEntity<Page<ProductoResponse>> getProductos(
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size)
+            throws ProductoNotFoundException {
         if (page == null || size == null)
             return ResponseEntity.ok(productoService.getProductos(PageRequest.of(0, Integer.MAX_VALUE)));
         return ResponseEntity.ok(productoService.getProductos(PageRequest.of(page, size)));
     }
 
-    // Obtener un producto por ID (lo pasó la profe)
+    // Obtener un producto por ID
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponse> getProductoById(@PathVariable Long id) {
-        Optional<ProductoResponse> result = productoService.getProductoById(id);
-        if (result.isPresent())
-            return ResponseEntity.ok(result.get());
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ProductoResponse> getProductoById(@PathVariable Long id) 
+            throws ProductoIdInvalidoException, ProductoNotFoundException {
+        ProductoResponse producto = productoService.getProductoById(id);
+        return ResponseEntity.ok(producto);
     }
 
     // Crear un nuevo producto
     @PostMapping
-    public ResponseEntity<ProductoResponse> crearProducto(@RequestBody ProductoRequest request) {
+    public ResponseEntity<ProductoResponse> guardarProducto(@RequestBody ProductoRequest request) 
+            throws ProductoDuplicateException, UsuarioNotFoundException {
         ProductoResponse guardado = productoService.guardarProducto(request);
         return ResponseEntity.ok(guardado);
     }
 
     // Actualizar un producto
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request) {
+    public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request)
+            throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
+
         ProductoResponse actualizado = productoService.actualizarProducto(id, request);
-        
-        if (actualizado != null) {
-            return ResponseEntity.ok(actualizado);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(actualizado);
     }
 
     // Eliminar (desactivar) un producto
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
-        if (productoService.getProductoById(id).isPresent()) {
-            productoService.eliminarProducto(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id)
+            throws ProductoNotFoundException, ProductoIdInvalidoException {
+
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
     }
 
     // Filtrar por Categoría
@@ -72,7 +74,8 @@ public class ProductoController {
     public ResponseEntity<Page<ProductoResponse>> getProductosByCategoria(
             @PathVariable Categoria categoria,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size) 
+            throws CategoriaInvalidaException, ProductoNotFoundException {
         
         if (page == null || size == null)
             return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(0, Integer.MAX_VALUE)));
@@ -86,7 +89,8 @@ public class ProductoController {
             @RequestParam Double min,
             @RequestParam Double max,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size)
+            throws PrecioInvalidoException {
         
         if (page == null || size == null)
             return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(0, Integer.MAX_VALUE)));
@@ -99,7 +103,8 @@ public class ProductoController {
     public ResponseEntity<Page<ProductoResponse>> getProductosByNombre(
             @RequestParam String nombre,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
+            @RequestParam(required = false) Integer size)
+            throws NombreInvalidoException, ProductoNotFoundException {
         
         if (page == null || size == null)
             return ResponseEntity.ok(productoService.getProductosByNombre(nombre, PageRequest.of(0, Integer.MAX_VALUE)));

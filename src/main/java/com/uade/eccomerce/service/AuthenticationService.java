@@ -26,13 +26,13 @@ public class AuthenticationService {
         public AuthenticationResponse register(RegisterRequest request) {
             // Crear el usuario
             var usuario = Usuario.builder()
-                .nombre(request.getFirstname())
-                .apellido(request.getLastname())
+                .nombre(request.getNombre())
+                .apellido(request.getApellido())
                 .email(request.getEmail())
-                .contrasena(passwordEncoder.encode(request.getPassword()))
+                .contrasena(passwordEncoder.encode(request.getContrasena()))
                 .rol(Rol.COMPRADOR)
                 .activo(true)
-                .fecha_creacion(new java.sql.Date(System.currentTimeMillis()))
+                .fechaCreacion(new java.sql.Date(System.currentTimeMillis()))
                 .build();
 
             repository.save(usuario);
@@ -48,7 +48,7 @@ public class AuthenticationService {
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     request.getEmail(),
-                    request.getPassword()));
+                    request.getContrasena()));
             // Va a la base de datos a buscar el usuario
             var usuario = repository.findByEmail(request.getEmail())
                 .orElseThrow();

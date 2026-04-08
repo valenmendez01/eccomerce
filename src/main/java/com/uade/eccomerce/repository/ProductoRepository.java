@@ -13,6 +13,9 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     // Listado de productos activos
     Page<Producto> findByActivoTrue(PageRequest pageable);
+
+    // Verificar si existe un producto con el mismo nombre (para evitar duplicados)
+    boolean existsByNombre(String nombre);
     
     // Filtrar por categoría
     Page<Producto> findByCategoriaAndActivoTrue(Categoria categoria, PageRequest pageable);

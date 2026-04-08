@@ -1,18 +1,25 @@
 package com.uade.eccomerce.service.producto;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
+import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
-import com.uade.eccomerce.entity.Imagen_productos;
+import com.uade.eccomerce.entity.ImagenProductos;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Usuario;
+import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
+import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
+import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
+import com.uade.eccomerce.exceptions.productos.filtros.CategoriaInvalidaException;
+import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
+import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
+import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.repository.ImagenRepository;
 import com.uade.eccomerce.repository.ProductoRepository;
 import com.uade.eccomerce.repository.UsuarioRepository;
@@ -29,10 +36,10 @@ public class ProductoServiceImp implements ProductoService {
     @Autowired
     private ImagenRepository imagenRepository;
 
-        // Método de mapeo (Helper)
-    private ProductoResponse mapToResponse(Producto producto) {
+    private ProductoResponse toResponse(Producto producto) {
+        // Usamos el Builder que definiste en ProductoResponse
         return ProductoResponse.builder()
-                .idProducto(producto.getIdproducto())
+                .idProducto(producto.getIdProducto()) // Aquí estaba el error de nombre
                 .nombre(producto.getNombre())
                 .description(producto.getDescription())
                 .precio(producto.getPrecio())
@@ -40,24 +47,68 @@ public class ProductoServiceImp implements ProductoService {
                 .descuento(producto.getDescuento())
                 .categoria(producto.getCategoria())
                 .activo(producto.getActivo())
-                .idUsuario(producto.getUsuario().getId_usuario())
-                .nombreUsuario(producto.getUsuario().getNombre()) 
-                .urlsImagenes(producto.getImages() != null ? 
-                        producto.getImages().stream().map(Imagen_productos::getUrl).collect(Collectors.toList()) : null)
+                // Mapeamos los datos del Usuario
+                .idUsuario(producto.getUsuario() != null ? producto.getUsuario().getIdUsuario() : null)
+                .nombreUsuario(producto.getUsuario() != null ? producto.getUsuario().getNombre() : null)
+                // Mapeamos la lista de URLs de imágenes
+                .urlsImagenes(producto.getImagenes() != null ? 
+                    producto.getImagenes().stream()
+                        .map(img -> img.getUrl()) // Extraemos el String de la URL
+                        .toList() : null)
                 .build();
     }
 
-    public Page<ProductoResponse> getProductos(PageRequest pageable) {
-        return productoRepository.findByActivoTrue(pageable).map(this::mapToResponse);
+    public Page<ProductoResponse> getProductos(PageRequest pageable) throws ProductoNotFoundException {
+        // Buscamos los productos en el repositorio
+        Page<Producto> productos = productoRepository.findByActivoTrue(pageable);
+        if (productos.isEmpty()) {
+            throw new ProductoNotFoundException();
+        }
+        // Mapeamos cada Producto a ProductoResponse
+        return productos.map(this::toResponse);
     }
 
-    public Optional<ProductoResponse> getProductoById(Long id) {
-        return productoRepository.findById(id).map(this::mapToResponse);
+    public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException {
+
+        // Validamos si el ID es nulo
+        if (id == null) {
+            throw new ProductoIdInvalidoException();
+        }
+
+        // Buscamos en el repositorio
+        Optional<Producto> result = productoRepository.findById(id);
+
+        // Validamos si se encontró el producto
+        if (!result.isPresent()) {
+            throw new ProductoNotFoundException();
+        }
+
+        // Si todo está bien, devolvemos el objeto directamente
+        return toResponse(result.get());
     }
 
-    public ProductoResponse guardarProducto(ProductoRequest request) {
+    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException {
+
+        // Validamos que no exista un producto con el mismo nombre
+        if (productoRepository.existsByNombre(request.getNombre())) {
+            throw new ProductoDuplicateException();
+        }
+
+        // Validamos que el vendedor exista
+        Long idVendedor = request.getIdUsuario();
+        if (idVendedor == null) {
+            throw new UsuarioNotFoundException(); 
+        }
+        // Buscamos al vendedor en el repositorio
+        Optional<Usuario> userResult = usuarioRepository.findById(idVendedor);
+        if (!userResult.isPresent()) {
+            throw new UsuarioNotFoundException();
+        }
+
+        // Creamos una entidad vacía
         Producto producto = new Producto();
         
+        // Seteamos los datos básicos que vienen en el Request
         producto.setNombre(request.getNombre());
         producto.setDescription(request.getDescription());
         producto.setPrecio(request.getPrecio());
@@ -65,29 +116,41 @@ public class ProductoServiceImp implements ProductoService {
         producto.setDescuento(request.getDescuento());
         producto.setCategoria(request.getCategoria());
         producto.setActivo(true);
-
-        Usuario vendedor = usuarioRepository.findById(request.getIdUsuario())
-            .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
-        producto.setUsuario(vendedor);
+        producto.setUsuario(userResult.get());
 
         Producto guardado = productoRepository.save(producto);
 
+        // Manejo de imágenes (si mandaron URLs)
         if (request.getUrlsImagenes() != null) {
             for (String url : request.getUrlsImagenes()) {
-                Imagen_productos img = new Imagen_productos();
+                ImagenProductos img = new ImagenProductos();
                 img.setUrl(url);
                 img.setProducto(guardado);
                 imagenRepository.save(img);
             }
         }
-        
-        return mapToResponse(guardado);
+        return toResponse(guardado);
     }
 
-    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) {
-        Producto productoExistente = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
 
+        // Validamos nulidad del ID
+        if (id == null) {
+            throw new ProductoIdInvalidoException();
+        }
+
+        // Buscamos el producto por ID
+        Optional<Producto> result = productoRepository.findById(id);
+
+        // Validamos que exista
+        if (!result.isPresent()) {
+            throw new ProductoNotFoundException();
+        }
+
+        // Si existe, obtenemos el objeto
+        Producto productoExistente = result.get();
+
+        // Actualizamos los campos básicos desde el Request
         productoExistente.setNombre(request.getNombre());
         productoExistente.setDescription(request.getDescription());
         productoExistente.setPrecio(request.getPrecio());
@@ -95,32 +158,88 @@ public class ProductoServiceImp implements ProductoService {
         productoExistente.setDescuento(request.getDescuento());
         productoExistente.setCategoria(request.getCategoria());
 
-        if (request.getIdUsuario() != null) {
-            Usuario nuevoVendedor = usuarioRepository.findById(request.getIdUsuario())
-                    .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
-            productoExistente.setUsuario(nuevoVendedor);
+        // Si el ID de usuario cambió, buscamos al nuevo vendedor
+        Long idVendedor = request.getIdUsuario();
+        if (idVendedor != null) {
+            Optional<Usuario> userResult = usuarioRepository.findById(idVendedor);
+            
+            if (!userResult.isPresent()) {
+                throw new UsuarioNotFoundException();
+            }
+            
+            productoExistente.setUsuario(userResult.get());
         }
 
-        return mapToResponse(productoRepository.save(productoExistente));
+        // Guardamos los cambios
+        return toResponse(productoRepository.save(productoExistente));
     }
 
-    public void eliminarProducto(Long id) {
-        productoRepository.findById(id).ifPresent(p -> {
-            p.setActivo(false);
-            productoRepository.save(p);
-        });
+    public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException {
+        // Validamos nulidad del ID
+        if (id == null) {
+            throw new ProductoIdInvalidoException();
+        }
+    
+        // Buscamos el producto por ID
+        Optional<Producto> result = productoRepository.findById(id);
+
+        // Validamos que exista
+        if (!result.isPresent()) {
+            throw new ProductoNotFoundException();
+        }
+
+        // Obtenemos el objeto
+        Producto p = result.get();
+
+        // Realizamos la baja lógica
+        p.setActivo(false);
+        productoRepository.save(p);
     }
 
-    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable) {
-        return productoRepository.findByCategoriaAndActivoTrue(categoria, pageable).map(this::mapToResponse);
+    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable)
+        throws CategoriaInvalidaException, ProductoNotFoundException {
+        // Validar que la categoría no sea nula
+        if (categoria == null) {
+            throw new CategoriaInvalidaException();
+        }
+
+        // Realizar la búsqueda
+        Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categoria, pageable);
+
+        // Validar si la página está vacía
+        if (result.isEmpty()) {
+            throw new ProductoNotFoundException();
+        }
+
+        return result.map(this::toResponse);
     }
 
-    public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) {
-        return productoRepository.findByPrecioBetweenAndActivoTrue(min, max, pageable).map(this::mapToResponse);
+    public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException {
+        
+        // Validar que el precio mínimo no sea mayor que el máximo y que no sean nulos
+        if (min == null || max == null || min > max) {
+            throw new PrecioInvalidoException();
+        }
+        Page<Producto> result = productoRepository.findByPrecioBetweenAndActivoTrue(min, max, pageable);
+        return result.map(this::toResponse);
     }
 
-    public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable) {
-        return productoRepository.findByNombreContainingIgnoreCaseAndActivoTrue(nombre, pageable).map(this::mapToResponse);
+    public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable)
+        throws NombreInvalidoException, ProductoNotFoundException {
+        // Validar que el nombre no sea nulo
+        if (nombre == null) {
+            throw new NombreInvalidoException();
+        }
+
+        // Realizar la búsqueda
+        Page<Producto> result = productoRepository.findByNombreContainingIgnoreCaseAndActivoTrue(nombre, pageable);
+
+        // Validar si la página está vacía
+        if (result.isEmpty()) {
+            throw new ProductoNotFoundException();
+        }
+
+        return result.map(this::toResponse);
     }
 
 }

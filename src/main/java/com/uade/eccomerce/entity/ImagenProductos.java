@@ -13,11 +13,11 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "imagenes_productos")
-public class Imagen_productos {
+@Table(name = "imagenesProductos")
+public class ImagenProductos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_imagen;
+    private Long idImagen;
 
     @Column(nullable = false)
     private String url;
@@ -25,6 +25,6 @@ public class Imagen_productos {
     // Relaciones
 
     @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
+    @JoinColumn(name = "idProducto", nullable = false)
     private Producto producto;
 }
