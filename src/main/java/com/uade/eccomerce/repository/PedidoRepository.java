@@ -11,6 +11,6 @@ import com.uade.eccomerce.entity.Pedido;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
-    List<Pedido> findByUsuarioId_usuario(Long idUsuario);
+    List<Pedido> findByUsuarioIdUsuario(Long idUsuario);
 
 }

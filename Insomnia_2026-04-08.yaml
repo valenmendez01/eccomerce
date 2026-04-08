@@ -1,0 +1,410 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Backend requests
+meta:
+  id: wrk_f545a1f95ea64259b1d857a465509628
+  created: 1775674838080
+  modified: 1775674877872
+  description: ""
+collection:
+  - name: Productos
+    meta:
+      id: fld_52d8abdce95342e2abc6a1533e37efbb
+      created: 1775615970003
+      modified: 1775615970003
+      sortKey: -1775615970010
+      description: ""
+    children:
+      - url: http://localhost:4002/productos
+        name: Crear producto (vendedor)
+        meta:
+          id: req_7fe4d87ece094660bb160e70e5262767
+          created: 1775614545069
+          modified: 1775677901085
+          isPrivate: false
+          description: ""
+          sortKey: -1775616005009
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nombre": "Figurita Messi Legend",
+              "description": "Cromo especial extra gold del mundial",
+              "precio": 5500.0,
+              "stock": 10,
+              "descuento": 0,
+              "categoria": "FIGURITAS",
+              "idUsuario": 1,
+              "urlsImagenes": [
+                "https://ejemplo.com/messi1.jpg",
+                "https://ejemplo.com/messi2.jpg"
+              ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJWRU5ERURPUiIsImlhdCI6MTc3NTY3NzAyNiwiZXhwIjoxNzc1NzYzNDI2fQ.hUCMTAvW5WhzJgeuH6_EWf_aB3lqSKY-IeVHqXwJiCxZNMwN1vHUWfCo8J5FvMR7XRrH2PCQF-JeXav2g7oX8w
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos
+        name: Obtener todos los productos (todos)
+        meta:
+          id: req_0101995849a94fde820d8df392d6ba1d
+          created: 1775614716046
+          modified: 1775678475258
+          isPrivate: false
+          description: |-
+            URL (sin paginación): http://localhost:4002/productos </br>
+            URL (con paginación): http://localhost:4002/productos?page=0&size=10
+          sortKey: -1775616004921.5
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/1
+        name: Obtener un producto por ID (todos)
+        meta:
+          id: req_7af90b03b459463c911244336a443234
+          created: 1775615103811
+          modified: 1775678542551
+          isPrivate: false
+          description: ""
+          sortKey: -1775616004915.25
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/1
+        name: Actualizar un producto (vendedor)
+        meta:
+          id: req_4f9594d08f6a432a827bbd81d1a9e384
+          created: 1775615171351
+          modified: 1775677907726
+          isPrivate: false
+          description: ""
+          sortKey: -1775616004959
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nombre": "Figurita Messi Legend (Actualizado)",
+              "description": "Cromo especial extra gold con protector incluido",
+              "precio": 6000.0,
+              "stock": 5,
+              "descuento": 5,
+              "categoria": "FIGURITAS",
+              "idUsuario": 1
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJWRU5ERURPUiIsImlhdCI6MTc3NTY3NzAyNiwiZXhwIjoxNzc1NzYzNDI2fQ.hUCMTAvW5WhzJgeuH6_EWf_aB3lqSKY-IeVHqXwJiCxZNMwN1vHUWfCo8J5FvMR7XRrH2PCQF-JeXav2g7oX8w
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/1
+        name: Eliminar (desactivar) un producto (vendedor)
+        meta:
+          id: req_adeb7d01c32f45a8ba4dc5ec9f3d69bf
+          created: 1775615318468
+          modified: 1775678161828
+          isPrivate: false
+          description: |-
+            Para activarlo, correr en la BDD:
+
+            UPDATE marketplace.productos </br>
+            SET activo = 1 </br>
+            WHERE id_producto = 1;
+          sortKey: -1775616004934
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        authentication:
+          type: bearer
+          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJWRU5ERURPUiIsImlhdCI6MTc3NTY3NzAyNiwiZXhwIjoxNzc1NzYzNDI2fQ.hUCMTAvW5WhzJgeuH6_EWf_aB3lqSKY-IeVHqXwJiCxZNMwN1vHUWfCo8J5FvMR7XRrH2PCQF-JeXav2g7oX8w
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/filtrar/FIGURITAS
+        name: Filtrar productos por Categoría (todos)
+        meta:
+          id: req_e6a439b14ce346fa8c935c646095b178
+          created: 1775615730929
+          modified: 1775679276160
+          isPrivate: false
+          description: >-
+            URL: http://localhost:4002/productos/filtrar/FIGURITAS </br>
+
+            URL (con paginación):
+            http://localhost:4002/productos/filtrar/FIGURITAS?page=0&size=10
+          sortKey: -1775616004909
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/filtrar/precio?min=1000&max=10000
+        name: Filtrar productos por Rango de Precio
+        meta:
+          id: req_25d31361b94243d7b99e90a20d35893c
+          created: 1775615789168
+          modified: 1775679376862
+          isPrivate: false
+          description: |-
+            URL: http://localhost:4002/productos/filtrar/precio?min=1000&max=10000 </br>
+            URL (con paginación): http://localhost:4002/productos/filtrar/precio?min=1000&max=10000&page=0&size=10
+          sortKey: -1775615994542
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/productos/filtrar/nombre?nombre=Messi
+        name: Buscar productos por Nombre
+        meta:
+          id: req_ff3da546dc7a4ebc99c0962437799e4a
+          created: 1775615924894
+          modified: 1775679469633
+          isPrivate: false
+          description: |-
+            URL: http://localhost:4002/productos/filtrar/nombre?nombre=Messi </br>
+            URL (con paginación): http://localhost:4002/productos/filtrar/nombre?nombre=Messi&page=0&size=10
+          sortKey: -1775615994442
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Auth
+    meta:
+      id: fld_f34082f43fa942d3bee6ecbed8d5b6bf
+      created: 1775616097477
+      modified: 1775677409870
+      sortKey: -1775616097477
+      description: ""
+    children:
+      - url: http://localhost:4002/api/v1/auth/register
+        name: Registro comprador (todos)
+        meta:
+          id: req_7d45d31320c549a1ad9eb24721df441f
+          created: 1775613554420
+          modified: 1775678485386
+          isPrivate: false
+          description: ""
+          sortKey: -1775616106084
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nombre": "Cosme",
+              "apellido": "Fulanito",
+              "email": "cosme@ejemplo.com",
+              "contrasena": "password123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/api/v1/auth/authenticate
+        name: Login comprador (todos)
+        meta:
+          id: req_a9b067d49ecd4945aa703b06b9583484
+          created: 1775670562813
+          modified: 1775678487079
+          isPrivate: false
+          description: ""
+          sortKey: -1775616105984
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "cosme@ejemplo.com",
+              "contrasena": "password123"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/api/v1/auth/authenticate
+        name: Login vendedor
+        meta:
+          id: req_6dd60c9a1348420786cb4eca779408c3
+          created: 1775676977725
+          modified: 1775677032395
+          isPrivate: false
+          description: ""
+          sortKey: -1775616106184
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "admin@ejemplo.com",
+              "contrasena": "password"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:4002/api/v1/auth/register
+        name: Registro vendedor (cambiar rol en BDD)
+        meta:
+          id: req_41785fe8bab54c21af1ae9536ad948d5
+          created: 1775677072881
+          modified: 1775677144241
+          isPrivate: false
+          description: ""
+          sortKey: -1775616106234
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nombre": "Empresa",
+              "apellido": "Panini",
+              "email": "admin@ejemplo.com",
+              "contrasena": "password"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_3032e1835a3e46e1939c890521b96ed9
+    created: 1775613554405
+    modified: 1775613554405
+environments:
+  name: Base Environment
+  meta:
+    id: env_0ece1a30ea904601b0800f6cc8a0c355
+    created: 1775613554401
+    modified: 1775613554401
+    isPrivate: false
