@@ -1,7 +1,6 @@
 package com.uade.eccomerce.service.usuario;
 
 import java.util.Optional;
-import java.sql.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,6 @@
 package com.uade.eccomerce.controllers.productos;
 
 import com.uade.eccomerce.entity.Categoria;
-import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.service.producto.ProductoService;
 
 import org.springframework.data.domain.Page;
@@ -22,7 +21,7 @@ public class ProductoController {
 
     // Obtener todos los productos paginados (lo pasó la profe)
     @GetMapping
-    public ResponseEntity<Page<Producto>> getProductos(
+    public ResponseEntity<Page<ProductoResponse>> getProductos(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         if (page == null || size == null)
@@ -32,8 +31,8 @@ public class ProductoController {
 
     // Obtener un producto por ID (lo pasó la profe)
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
-        Optional<Producto> result = productoService.getProductoById(id);
+    public ResponseEntity<ProductoResponse> getProductoById(@PathVariable Long id) {
+        Optional<ProductoResponse> result = productoService.getProductoById(id);
         if (result.isPresent())
             return ResponseEntity.ok(result.get());
 
@@ -42,15 +41,15 @@ public class ProductoController {
 
     // Crear un nuevo producto
     @PostMapping
-    public ResponseEntity<Producto> crearProducto(@RequestBody ProductoRequest request) {
-        Producto guardado = productoService.guardarProducto(request);
+    public ResponseEntity<ProductoResponse> crearProducto(@RequestBody ProductoRequest request) {
+        ProductoResponse guardado = productoService.guardarProducto(request);
         return ResponseEntity.ok(guardado);
     }
 
     // Actualizar un producto
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request) {
-        Producto actualizado = productoService.actualizarProducto(id, request);
+    public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request) {
+        ProductoResponse actualizado = productoService.actualizarProducto(id, request);
         
         if (actualizado != null) {
             return ResponseEntity.ok(actualizado);
@@ -70,7 +69,7 @@ public class ProductoController {
 
     // Filtrar por Categoría
     @GetMapping("/filtrar/{categoria}")
-    public ResponseEntity<Page<Producto>> getProductosByCategoria(
+    public ResponseEntity<Page<ProductoResponse>> getProductosByCategoria(
             @PathVariable Categoria categoria,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
@@ -83,7 +82,7 @@ public class ProductoController {
 
     // Filtrar por Rango de Precio
     @GetMapping("/filtrar/precio")
-    public ResponseEntity<Page<Producto>> getProductosByPrecio(
+    public ResponseEntity<Page<ProductoResponse>> getProductosByPrecio(
             @RequestParam Double min,
             @RequestParam Double max,
             @RequestParam(required = false) Integer page,
@@ -97,7 +96,7 @@ public class ProductoController {
 
     // Buscar por Nombre
     @GetMapping("/filtrar/nombre")
-    public ResponseEntity<Page<Producto>> getProductosByNombre(
+    public ResponseEntity<Page<ProductoResponse>> getProductosByNombre(
             @RequestParam String nombre,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {

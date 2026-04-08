@@ -6,25 +6,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
+import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
-import com.uade.eccomerce.entity.Producto;
 
 public interface ProductoService {
 
-    public Page<Producto> getProductos(PageRequest pageable);
+    public Page<ProductoResponse> getProductos(PageRequest pageable);
 
-    public Optional<Producto> getProductoById(Long id);
+    public Optional<ProductoResponse> getProductoById(Long id);
 
-    public Producto guardarProducto(ProductoRequest request);
+    public ProductoResponse guardarProducto(ProductoRequest request);
 
-    public Producto actualizarProducto(Long id, ProductoRequest request);
+    public ProductoResponse actualizarProducto(Long id, ProductoRequest request);
 
     public void eliminarProducto(Long id);
 
-    public Page<Producto> getProductosByCategoria(Categoria categoria, PageRequest pageable);
+    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable);
 
-    public Page<Producto> getProductosByPrecio(Double min, Double max, PageRequest pageable);
+    public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable);
 
-    public Page<Producto> getProductosByNombre(String nombre, PageRequest pageable);
+    public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable);
     
 }
