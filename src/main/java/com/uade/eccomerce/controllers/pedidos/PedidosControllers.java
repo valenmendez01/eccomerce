@@ -1,0 +1,44 @@
+package com.uade.eccomerce.controllers.pedidos;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.uade.eccomerce.service.pedido.PedidoService;
+
+
+@RestController
+@RequestMapping("/pedidos")
+public class PedidosControllers  {
+    
+
+    @Autowired
+    private PedidoService pedidoService;
+
+    @PostMapping
+    public PedidoResponse crearPedido(@RequestBody PedidoRequest request) {
+        return pedidoService.crearPedido(request);
+    }
+
+    @GetMapping
+    public List<PedidoResponse> obtenerTodosLosPedidos() {
+        return pedidoService.obtenerTodosLosPedidos();
+    }
+
+    @GetMapping("/{id}")
+    public PedidoResponse obtenerPedidoPorId(@PathVariable Long id) {
+        return pedidoService.obtenerPedidoPorId(id);
+    }
+
+    @PutMapping("/{id}")
+    public PedidoResponse actualizarPedido(@PathVariable Long id, @RequestBody PedidoRequest request) {
+        return pedidoService.actualizarPedido(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminarPedido(@PathVariable Long id) {
+        pedidoService.eliminarPedido(id);
+    }
+
+}
