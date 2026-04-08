@@ -51,7 +51,7 @@ public class Usuario implements UserDetails {
     private Boolean activo;
     
     @Column(nullable = false)
-    private Date fecha_creacion;
+    private Date fechaCreacion;
 
     // Relaciones
 

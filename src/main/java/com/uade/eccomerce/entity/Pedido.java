@@ -20,10 +20,10 @@ import lombok.Data;
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_pedido;
+    private Long idPedido;
 
     @Column(nullable = false)
-    private Date fecha_pedido;
+    private Date fechaPedido;
 
     @Column(nullable = false)
     private Double total;
@@ -31,9 +31,9 @@ public class Pedido {
     // Relaciones
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
     @OneToMany(mappedBy = "pedido")
-    private List<Detalle_pedidos> detalle_pedidos;
+    private List<DetallePedidos> detallePedidos;
 }

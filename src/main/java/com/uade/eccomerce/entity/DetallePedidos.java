@@ -12,26 +12,26 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "detalle_pedidos")
-public class Detalle_pedidos {
+@Table(name = "detallePedidos")
+public class DetallePedidos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_detalle_pedido;
+    private Long idDetallePedido;
 
     @Column(nullable = false)
     private Integer cantidad;
 
     @Column(nullable = false)
-    private Double precio_unitario;
+    private Double precioUnitario;
 
     // Relaciones
 
     @ManyToOne
-    @JoinColumn(name = "id_pedido", nullable = false)
+    @JoinColumn(name = "idPedido", nullable = false)
     private Pedido pedido;
     
     @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
+    @JoinColumn(name = "idProducto", nullable = false)
     private Producto producto;
 }

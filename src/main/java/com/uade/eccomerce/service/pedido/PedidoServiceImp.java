@@ -30,7 +30,7 @@ public class PedidoServiceImp implements PedidoService {
         Usuario usuario = usuarioRepository.findById(request.getIdUsuario()).orElse(null);
 
         Pedido pedido = new Pedido();
-        pedido.setFecha_pedido(new Date(System.currentTimeMillis()));
+        pedido.setFechaPedido(new Date(System.currentTimeMillis()));
         pedido.setTotal(request.getTotal());
         pedido.setUsuario(usuario);
 
@@ -88,10 +88,10 @@ public class PedidoServiceImp implements PedidoService {
 
         PedidoResponse response = new PedidoResponse();
 
-        response.setIdPedido(pedido.getId_pedido());
-        response.setFechaPedido(pedido.getFecha_pedido());
+        response.setIdPedido(pedido.getIdPedido());
+        response.setFechaPedido(pedido.getFechaPedido());
         response.setTotal(pedido.getTotal());
-        response.setIdUsuario(pedido.getUsuario().getId_usuario());
+        response.setIdUsuario(pedido.getUsuario().getIdUsuario());
 
         return response;
     }

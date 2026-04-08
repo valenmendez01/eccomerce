@@ -21,8 +21,7 @@ import lombok.Data;
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
-    private Long idproducto;
+    private Long idProducto;
 
     @Column(nullable = false)
     private String nombre;
@@ -48,12 +47,12 @@ public class Producto {
     private Categoria categoria;
 
     @OneToMany(mappedBy = "producto")
-    private List<Detalle_pedidos> detalle_pedidos;
+    private List<DetallePedidos> detallePedidos;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
     @OneToMany(mappedBy = "producto")
-    private List<Imagen_productos> images;
+    private List<ImagenProductos> imagenes;
 }
