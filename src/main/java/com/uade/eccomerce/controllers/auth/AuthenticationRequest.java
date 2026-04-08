@@ -1,16 +1,16 @@
-// package com.uade.tpo.demo.controllers.auth;
+package com.uade.eccomerce.controllers.auth;
 
-// import lombok.AllArgsConstructor;
-// import lombok.Builder;
-// import lombok.Data;
-// import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-// @Data
-// @Builder
-// @AllArgsConstructor
-// @NoArgsConstructor
-// public class AuthenticationRequest {
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class AuthenticationRequest {
 
-//     private String email;
-//     String password;
-// }
+    private String email;
+    String password;
+}

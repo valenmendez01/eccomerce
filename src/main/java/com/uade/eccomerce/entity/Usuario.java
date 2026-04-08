@@ -1,11 +1,12 @@
 package com.uade.eccomerce.entity;
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 
-// import org.springframework.security.core.GrantedAuthority;
-// import org.springframework.security.core.authority.SimpleGrantedAuthority;
-// import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +28,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {  // implements UserDetails
+
+public class Usuario implements UserDetails { 
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,33 +69,38 @@ public class Usuario {  // implements UserDetails
 
     // Métodos de UserDetails para seguridad
 
-    // @Override
-    // public Collection<? extends GrantedAuthority> getAuthorities() {
-    //     return List.of(new SimpleGrantedAuthority(role.name()));
-    // }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(rol.name()));
+    }
 
-    // @Override
-    // public String getUsername() {
-    //     return email;
-    // }
+    @Override
+    public String getPassword() {
+        return contrasena;
+    }
 
-    // @Override
-    // public boolean isAccountNonExpired() {
-    //     return true;
-    // }
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-    // @Override
-    // public boolean isAccountNonLocked() {
-    //     return true;
-    // }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-    // @Override
-    // public boolean isCredentialsNonExpired() {
-    //     return true;
-    // }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-    // @Override
-    // public boolean isEnabled() {
-    //     return true;
-    // }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return activo;
+    }
 }
