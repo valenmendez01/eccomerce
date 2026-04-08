@@ -33,10 +33,7 @@ public class Usuario implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
-
-    @Column(nullable = false, unique = true)
-    private String username;
+    private Long idUsuario;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -101,6 +98,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return activo;
+        return true;
     }
 }

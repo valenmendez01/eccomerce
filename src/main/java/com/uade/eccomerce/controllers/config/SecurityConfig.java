@@ -2,6 +2,7 @@ package com.uade.eccomerce.controllers.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,10 +27,19 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             // Permite el acceso sin necesidad de estar autenticado (cualquier rol)
-            .authorizeHttpRequests(req -> req.requestMatchers("/api/v1/auth/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated())
+            .authorizeHttpRequests(req -> req
+                // Rutas públicas (Registro y Login)
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                
+                // Configuración de Productos
+                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Todos ven productos
+                .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor crea
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor edita
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor elimina
+
+                // Cualquier otra ruta requiere estar autenticado
+                .anyRequest().authenticated()
+            )
             // Configura la política de creación de sesiones como STATELESS para que no se cree una sesión en el servidor y se utilice el token JWT para autenticar cada solicitud
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             // Configura el proveedor de autenticación para que se utilice el AuthenticationProvider personalizado que se ha definido en ApplicationConfig para autenticar a los usuarios con el nombre de usuario y la contraseña almacenados en la base de datos
