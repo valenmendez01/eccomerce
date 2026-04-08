@@ -33,9 +33,13 @@ public class JwtService {
     private String buildToken(
             UserDetails userDetails,
             long expiration) {
+        
+        String role = userDetails.getAuthorities().iterator().next().getAuthority();
+        
         return Jwts
                 .builder()
                 .subject(userDetails.getUsername())
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSecretKey())

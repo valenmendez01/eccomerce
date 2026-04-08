@@ -1,18 +1,28 @@
 # Test Requests
 
-## Crear un Usuario
+## Registro comprador
 Método: POST
-URL: http://localhost:4002/usuarios
+URL: http://localhost:4002/api/v1/auth/register
 Body (JSON)
 ```bash
 {
-  "username": "comprador_test",
-  "email": "comprador@test.com",
-  "contrasena": "password123",
-  "nombre": "Juan",
-  "apellido": "Perez"
+  "firstname": "Cosme",
+  "lastname": "Fulanito",
+  "email": "cosme@ejemplo.com",
+  "password": "password123"
 }
 ```
+## Login comprador
+Método: POST
+URL: http://localhost:4002/api/v1/auth/authenticate
+Body (JSON)
+```bash
+{
+  "email": "cosme@ejemplo.com",
+  "password": "password123"
+}
+```
+
 ## Crear Producto
 Método: POST
 URL: http://localhost:4002/productos

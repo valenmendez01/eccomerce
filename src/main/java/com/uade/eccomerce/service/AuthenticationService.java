@@ -9,6 +9,7 @@ import com.uade.eccomerce.controllers.auth.AuthenticationRequest;
 import com.uade.eccomerce.controllers.auth.AuthenticationResponse;
 import com.uade.eccomerce.controllers.auth.RegisterRequest;
 import com.uade.eccomerce.controllers.config.JwtService;
+import com.uade.eccomerce.entity.Rol;
 import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.repository.UsuarioRepository;
 
@@ -29,7 +30,9 @@ public class AuthenticationService {
                 .apellido(request.getLastname())
                 .email(request.getEmail())
                 .contrasena(passwordEncoder.encode(request.getPassword()))
-                .rol(request.getRole())
+                .rol(Rol.COMPRADOR)
+                .activo(true)
+                .fecha_creacion(new java.sql.Date(System.currentTimeMillis()))
                 .build();
 
             repository.save(usuario);
