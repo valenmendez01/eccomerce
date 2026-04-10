@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
+import com.uade.eccomerce.exceptions.productos.StockInsuficienteException;
+import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.service.pedido.PedidoService;
 
 
@@ -17,7 +20,9 @@ public class PedidosControllers  {
     private PedidoService pedidoService;
 
     @PostMapping
-    public PedidoResponse crearPedido(@RequestBody PedidoRequest request) {
+    public PedidoResponse crearPedido(@RequestBody PedidoRequest request)
+            throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
+
         return pedidoService.crearPedido(request);
     }
 
@@ -31,10 +36,10 @@ public class PedidosControllers  {
         return pedidoService.obtenerPedidoPorId(id);
     }
 
-    @PutMapping("/{id}")
-    public PedidoResponse actualizarPedido(@PathVariable Long id, @RequestBody PedidoRequest request) {
-        return pedidoService.actualizarPedido(id, request);
-    }
+    // @PutMapping("/{id}")
+    // public PedidoResponse actualizarPedido(@PathVariable Long id, @RequestBody PedidoRequest request) {
+    //     return pedidoService.actualizarPedido(id, request);
+    // }
 
     @DeleteMapping("/{id}")
     public void eliminarPedido(@PathVariable Long id) {

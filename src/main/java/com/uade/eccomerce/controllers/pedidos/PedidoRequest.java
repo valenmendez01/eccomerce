@@ -1,5 +1,6 @@
 package com.uade.eccomerce.controllers.pedidos;
 
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -7,6 +8,6 @@ import lombok.Data;
 public class PedidoRequest {
 
     private Long idUsuario;
-    private Double total;
+    private List<ItemRequest> items;
 
 }

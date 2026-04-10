@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor crea
                 .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor edita
                 .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor elimina
+                .requestMatchers(HttpMethod.POST, "/pedidos").hasAuthority("COMPRADOR") // Solo el comprador hace pedidos 
 
                 // Cualquier otra ruta requiere estar autenticado
                 .anyRequest().authenticated()
