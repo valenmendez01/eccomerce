@@ -1,6 +1,7 @@
 package com.uade.eccomerce.service.pedido;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.uade.eccomerce.controllers.pedidos.PedidoResponse;
 import com.uade.eccomerce.exceptions.usuarios.*;
@@ -12,12 +13,11 @@ import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
 
 public interface PedidoService {
 
-    PedidoResponse crearPedido(PedidoRequest request)
-        throws UsuarioNotFoundException,
-               ProductoNotFoundException,
-               StockInsuficienteException;
+    PedidoResponse crearPedido(PedidoRequest request) throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException;
 
-    List<PedidoResponse> obtenerTodosLosPedidos() throws PedidoNotFoundException;
+    Page<PedidoResponse> obtenerTodosLosPedidos(PageRequest pageable) throws PedidoNotFoundException;
+
+    Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException;
 
     PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException;
 

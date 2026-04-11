@@ -48,13 +48,11 @@ public class ProductoController {
     }
 
     // Crear un nuevo producto
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductoResponse> guardarProducto(
-            @RequestPart("producto") ProductoRequest request,
-            @RequestPart("imagenes") List<MultipartFile> imagenes) 
-            throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException {
-        ProductoResponse guardado = productoService.guardarProducto(request, imagenes);
-        return ResponseEntity.ok(guardado);
+    @PostMapping
+    public ResponseEntity<ProductoResponse> guardarProducto(@RequestBody ProductoRequest request) 
+            throws ProductoDuplicateException, UsuarioNotFoundException {
+
+        return ResponseEntity.ok(productoService.guardarProducto(request));
     }
 
     // Actualizar un producto

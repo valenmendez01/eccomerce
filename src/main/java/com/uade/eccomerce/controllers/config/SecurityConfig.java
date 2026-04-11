@@ -34,11 +34,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 
                 // Configuración de Productos
-                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Todos ven productos
-                .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor crea
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor edita
-                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor elimina
-                .requestMatchers(HttpMethod.POST, "/pedidos").hasAuthority(Rol.COMPRADOR.name()) // Solo el comprador hace pedidos 
+                .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Público
+                .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
+
+                // Configuración de Pedidos
+                .requestMatchers(HttpMethod.POST, "/pedidos").hasAuthority(Rol.COMPRADOR.name())
+                .requestMatchers(HttpMethod.GET, "/pedidos/usuario/**").hasAuthority(Rol.COMPRADOR.name()) // Comprador ve sus pedidos
+                .requestMatchers(HttpMethod.GET, "/pedidos/{id}").hasAnyAuthority(Rol.COMPRADOR.name(), Rol.VENDEDOR.name()) // Detalle compra
+                .requestMatchers(HttpMethod.GET, "/pedidos").hasAuthority(Rol.VENDEDOR.name())
+                .requestMatchers(HttpMethod.DELETE, "/pedidos/**").hasAuthority(Rol.COMPRADOR.name()) // Solo el comprador cancela su pedido
 
                 // Cualquier otra ruta requiere estar autenticado
                 .anyRequest().authenticated()

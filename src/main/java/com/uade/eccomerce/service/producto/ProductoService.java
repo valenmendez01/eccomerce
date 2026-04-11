@@ -23,7 +23,7 @@ public interface ProductoService {
 
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException;
 
-    public ProductoResponse guardarProducto(ProductoRequest request, List<MultipartFile> archivos) throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException;
+    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException;
 
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException;
 
@@ -34,5 +34,7 @@ public interface ProductoService {
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException;
 
     public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable) throws NombreInvalidoException, ProductoNotFoundException;
+
+    boolean tieneStock(Long id, Integer cantidadSolicitada) throws ProductoNotFoundException;
 
 }

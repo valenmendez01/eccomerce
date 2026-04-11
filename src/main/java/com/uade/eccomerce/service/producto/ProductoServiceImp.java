@@ -1,7 +1,5 @@
 package com.uade.eccomerce.service.producto;
 
-import java.sql.Blob;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.uade.eccomerce.controllers.imagenes.ImagenResponse;
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
-import com.uade.eccomerce.entity.ImagenProductos;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
@@ -24,7 +21,6 @@ import com.uade.eccomerce.exceptions.productos.filtros.CategoriaInvalidaExceptio
 import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
 import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
-import com.uade.eccomerce.repository.ImagenRepository;
 import com.uade.eccomerce.repository.ProductoRepository;
 import com.uade.eccomerce.repository.UsuarioRepository;
 
@@ -37,36 +33,36 @@ public class ProductoServiceImp implements ProductoService {
     @Autowired 
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private ImagenRepository imagenRepository;
-
     private ProductoResponse toResponse(Producto producto) {
         // Usamos el Builder que definiste en ProductoResponse
         return ProductoResponse.builder()
-                .idProducto(producto.getIdProducto()) // Aquí estaba el error de nombre
-                .nombre(producto.getNombre())
-                .description(producto.getDescription())
-                .precio(producto.getPrecio())
-                .stock(producto.getStock())
-                .descuento(producto.getDescuento())
-                .categoria(producto.getCategoria())
-                .activo(producto.getActivo())
-                // Mapeamos los datos del Usuario
-                .idUsuario(producto.getUsuario() != null ? producto.getUsuario().getIdUsuario() : null)
-                .nombreUsuario(producto.getUsuario() != null ? producto.getUsuario().getNombre() : null)
-                // Mapeamos la lista de URLs de imágenes
-                .urlsImagenes(producto.getImagenes() != null ? 
-                    producto.getImagenes().stream()
-                        .map(img -> {
-                            try {
-                                // Extraemos los bytes del Blob y codificamos a Base64
-                                byte[] bytes = img.getContenido().getBytes(1, (int) img.getContenido().length());
-                                return java.util.Base64.getEncoder().encodeToString(bytes);
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        }).toList() : null)
-                .build();
+            .idProducto(producto.getIdProducto())
+            .nombre(producto.getNombre())
+            .description(producto.getDescription())
+            .precio(producto.getPrecio())
+            .stock(producto.getStock())
+            .disponible(producto.getStock() > 0 && producto.getActivo())
+            .descuento(producto.getDescuento())
+            .categoria(producto.getCategoria())
+            .activo(producto.getActivo())
+            // Mapeamos los datos del Usuario
+            .idUsuario(producto.getUsuario() != null ? producto.getUsuario().getIdUsuario() : null)
+            .nombreUsuario(producto.getUsuario() != null ? producto.getUsuario().getNombre() : null)
+            // Mapeamos la lista de URLs de imágenes
+            .imagenes(producto.getImagenes() != null ? 
+                producto.getImagenes().stream()
+                    .map(img -> {
+                        try {
+                            byte[] bytes = img.getContenido().getBytes(1, (int) img.getContenido().length());
+                            return ImagenResponse.builder()
+                                    .idImagen(img.getIdImagen()) // El ID es clave para el front
+                                    .contenidoBase64(java.util.Base64.getEncoder().encodeToString(bytes))
+                                    .build();
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }).toList() : null)
+            .build();
     }
 
     public Page<ProductoResponse> getProductos(PageRequest pageable) throws ProductoNotFoundException {
@@ -99,7 +95,7 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public ProductoResponse guardarProducto(ProductoRequest request, List<MultipartFile> archivos) throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException {
+    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException {
 
         // Validamos que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(request.getNombre())) {
@@ -132,19 +128,6 @@ public class ProductoServiceImp implements ProductoService {
 
         Producto guardado = productoRepository.save(producto);
 
-        // Manejo de imágenes (si mandaron URLs)
-        if (archivos != null) {
-            for (MultipartFile f : archivos) {
-                // Convertimos MultipartFile a Blob
-                byte[] bytes = f.getBytes();
-                Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
-                
-                ImagenProductos img = new ImagenProductos();
-                img.setContenido(blob);
-                img.setProducto(guardado);
-                imagenRepository.save(img);
-            }
-        }
         return toResponse(guardado);
     }
 
@@ -258,6 +241,20 @@ public class ProductoServiceImp implements ProductoService {
         }
 
         return result.map(this::toResponse);
+    }
+
+    public boolean tieneStock(Long id, Integer cantidadSolicitada) throws ProductoNotFoundException {
+        
+        Optional<Producto> result = productoRepository.findById(id);
+
+        // Validamos que exista
+        if (!result.isPresent()) {
+            throw new ProductoNotFoundException();
+        }
+
+        // Usamos .get() para acceder a los métodos de la entidad Producto
+        Producto producto = result.get();
+        return producto.getStock() >= cantidadSolicitada && producto.getActivo();
     }
 
 }
