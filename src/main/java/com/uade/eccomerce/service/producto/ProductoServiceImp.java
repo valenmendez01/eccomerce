@@ -1,11 +1,15 @@
 package com.uade.eccomerce.service.producto;
 
+import java.sql.Blob;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
@@ -53,8 +57,15 @@ public class ProductoServiceImp implements ProductoService {
                 // Mapeamos la lista de URLs de imágenes
                 .urlsImagenes(producto.getImagenes() != null ? 
                     producto.getImagenes().stream()
-                        .map(img -> img.getUrl()) // Extraemos el String de la URL
-                        .toList() : null)
+                        .map(img -> {
+                            try {
+                                // Extraemos los bytes del Blob y codificamos a Base64
+                                byte[] bytes = img.getContenido().getBytes(1, (int) img.getContenido().length());
+                                return java.util.Base64.getEncoder().encodeToString(bytes);
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        }).toList() : null)
                 .build();
     }
 
@@ -87,7 +98,8 @@ public class ProductoServiceImp implements ProductoService {
         return toResponse(result.get());
     }
 
-    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException {
+    @Transactional(rollbackFor = Throwable.class)
+    public ProductoResponse guardarProducto(ProductoRequest request, List<MultipartFile> archivos) throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException {
 
         // Validamos que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(request.getNombre())) {
@@ -121,10 +133,14 @@ public class ProductoServiceImp implements ProductoService {
         Producto guardado = productoRepository.save(producto);
 
         // Manejo de imágenes (si mandaron URLs)
-        if (request.getUrlsImagenes() != null) {
-            for (String url : request.getUrlsImagenes()) {
+        if (archivos != null) {
+            for (MultipartFile f : archivos) {
+                // Convertimos MultipartFile a Blob
+                byte[] bytes = f.getBytes();
+                Blob blob = new javax.sql.rowset.serial.SerialBlob(bytes);
+                
                 ImagenProductos img = new ImagenProductos();
-                img.setUrl(url);
+                img.setContenido(blob);
                 img.setProducto(guardado);
                 imagenRepository.save(img);
             }
@@ -132,6 +148,7 @@ public class ProductoServiceImp implements ProductoService {
         return toResponse(guardado);
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
 
         // Validamos nulidad del ID
@@ -174,6 +191,7 @@ public class ProductoServiceImp implements ProductoService {
         return toResponse(productoRepository.save(productoExistente));
     }
 
+    @Transactional(rollbackFor = Throwable.class)
     public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException {
         // Validamos nulidad del ID
         if (id == null) {

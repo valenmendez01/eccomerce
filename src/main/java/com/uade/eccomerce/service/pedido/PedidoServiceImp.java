@@ -3,10 +3,12 @@ package com.uade.eccomerce.service.pedido;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.eccomerce.controllers.pedidos.PedidoResponse;
 import com.uade.eccomerce.controllers.pedidos.ItemRequest;
@@ -15,14 +17,14 @@ import com.uade.eccomerce.entity.DetallePedidos;
 import com.uade.eccomerce.entity.Pedido;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Usuario;
+import com.uade.eccomerce.exceptions.pedidos.PedidoIdInvalidoException;
+import com.uade.eccomerce.exceptions.pedidos.PedidoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.StockInsuficienteException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.repository.PedidoRepository;
 import com.uade.eccomerce.repository.ProductoRepository;
 import com.uade.eccomerce.repository.UsuarioRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoServiceImp implements PedidoService {
@@ -36,8 +38,7 @@ public class PedidoServiceImp implements PedidoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    @Override
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public PedidoResponse crearPedido(PedidoRequest request)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
 
@@ -81,28 +82,33 @@ public class PedidoServiceImp implements PedidoService {
         return convertirAResponse(guardado);
     }
 
-    @Override
-    public List<PedidoResponse> obtenerTodosLosPedidos() {
-
-        return pedidoRepository.findAll()
-                .stream()
-                .map(this::convertirAResponse)
-                .collect(Collectors.toList());
+    public List<PedidoResponse> obtenerTodosLosPedidos() throws PedidoNotFoundException {
+        List<Pedido> pedidos = pedidoRepository.findAll();
+            if (pedidos.isEmpty()) {
+                throw new PedidoNotFoundException();
+            }
+            return pedidos.stream()
+                    .map(this::convertirAResponse)
+                    .collect(Collectors.toList());
     }
 
-    @Override
-    public PedidoResponse obtenerPedidoPorId(Long id) {
-
-        Pedido pedido = pedidoRepository.findById(id).orElse(null);
-
-        if (pedido == null) {
-            return null;
+    public PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
+        // Validamos nulidad del ID
+        if (id == null) {
+            throw new PedidoIdInvalidoException();
         }
 
-        return convertirAResponse(pedido);
+        Optional<Pedido> pedido = pedidoRepository.findById(id);
+
+        // Validamos si se encontró el pedido
+        if (!pedido.isPresent()) {
+            throw new PedidoNotFoundException();
+        }
+
+        return convertirAResponse(pedido.get());
     }
 
-    // @Override
+    // @Transactional(rollbackFor = Throwable.class)
     // public PedidoResponse actualizarPedido(Long id, PedidoRequest request) {
 
     //     Pedido pedido = pedidoRepository.findById(id).orElse(null);
@@ -121,8 +127,16 @@ public class PedidoServiceImp implements PedidoService {
     //     return convertirAResponse(pedidoActualizado);
     // }
 
-    @Override
-    public void eliminarPedido(Long id) {
+    @Transactional(rollbackFor = Throwable.class)
+    public void eliminarPedido(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
+        // Validamos nulidad del ID
+        if (id == null) {
+            throw new PedidoIdInvalidoException();
+        }
+        // Validamos existencia del pedido
+        if (!pedidoRepository.existsById(id)) {
+            throw new PedidoNotFoundException();
+        }
         pedidoRepository.deleteById(id);
     }
 

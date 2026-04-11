@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.uade.eccomerce.exceptions.pedidos.PedidoIdInvalidoException;
+import com.uade.eccomerce.exceptions.pedidos.PedidoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.StockInsuficienteException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
@@ -27,12 +29,12 @@ public class PedidosControllers  {
     }
 
     @GetMapping
-    public List<PedidoResponse> obtenerTodosLosPedidos() {
+    public List<PedidoResponse> obtenerTodosLosPedidos() throws PedidoNotFoundException {
         return pedidoService.obtenerTodosLosPedidos();
     }
 
     @GetMapping("/{id}")
-    public PedidoResponse obtenerPedidoPorId(@PathVariable Long id) {
+    public PedidoResponse obtenerPedidoPorId(@PathVariable Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
         return pedidoService.obtenerPedidoPorId(id);
     }
 
@@ -42,7 +44,7 @@ public class PedidosControllers  {
     // }
 
     @DeleteMapping("/{id}")
-    public void eliminarPedido(@PathVariable Long id) {
+    public void eliminarPedido(@PathVariable Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
         pedidoService.eliminarPedido(id);
     }
 

@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.uade.eccomerce.entity.Rol;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import lombok.RequiredArgsConstructor;
@@ -33,10 +35,10 @@ public class SecurityConfig {
                 
                 // Configuración de Productos
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Todos ven productos
-                .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor crea
-                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor edita
-                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("VENDEDOR") // Solo el vendedor elimina
-                .requestMatchers(HttpMethod.POST, "/pedidos").hasAuthority("COMPRADOR") // Solo el comprador hace pedidos 
+                .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor crea
+                .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor edita
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Rol.VENDEDOR.name()) // Solo el vendedor elimina
+                .requestMatchers(HttpMethod.POST, "/pedidos").hasAuthority(Rol.COMPRADOR.name()) // Solo el comprador hace pedidos 
 
                 // Cualquier otra ruta requiere estar autenticado
                 .anyRequest().authenticated()
