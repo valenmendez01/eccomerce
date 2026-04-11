@@ -30,6 +30,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             // Permite el acceso sin necesidad de estar autenticado (cualquier rol)
             .authorizeHttpRequests(req -> req
+                // Permitir la ruta interna de errores para ver las excepciones
+                .requestMatchers("/error").permitAll()
                 // Rutas públicas (Registro y Login)
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 
