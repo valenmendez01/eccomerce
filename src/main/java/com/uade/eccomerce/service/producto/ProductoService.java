@@ -1,10 +1,7 @@
 package com.uade.eccomerce.service.producto;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
