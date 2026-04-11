@@ -1,5 +1,6 @@
 package com.uade.eccomerce.service.imagen;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -24,7 +25,7 @@ public class ImagenServiceImp implements ImagenService {
     private ProductoRepository productoRepository;
 
     @Transactional(rollbackFor = Throwable.class)
-    public void agregarImagenAProducto(Long idProducto, MultipartFile archivo) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
+    public void agregarImagenesAProducto(Long idProducto, List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
         
         Optional<Producto> result = productoRepository.findById(idProducto);
         if (result.isEmpty()) {
@@ -32,12 +33,15 @@ public class ImagenServiceImp implements ImagenService {
         }
         Producto producto = result.get();
 
-        ImagenProductos img = new ImagenProductos();
-        img.setContenido(new SerialBlob(archivo.getBytes()));
-        
-        img.setProducto(producto); 
-
-        imagenRepository.save(img);
+        // Iteramos sobre la lista de archivos (imagenes)
+        for (MultipartFile archivo : archivos) {
+            if (!archivo.isEmpty()) { // Validamos que no esté vacío
+                ImagenProductos img = new ImagenProductos();
+                img.setContenido(new SerialBlob(archivo.getBytes()));
+                img.setProducto(producto); 
+                imagenRepository.save(img);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Throwable.class)

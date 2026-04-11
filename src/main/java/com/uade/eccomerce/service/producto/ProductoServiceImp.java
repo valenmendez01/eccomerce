@@ -65,6 +65,7 @@ public class ProductoServiceImp implements ProductoService {
             .build();
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductos(PageRequest pageable) throws ProductoNotFoundException {
         // Buscamos los productos en el repositorio
         Page<Producto> productos = productoRepository.findByActivoTrue(pageable);
@@ -75,6 +76,7 @@ public class ProductoServiceImp implements ProductoService {
         return productos.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException {
 
         // Validamos si el ID es nulo
@@ -197,6 +199,7 @@ public class ProductoServiceImp implements ProductoService {
         productoRepository.save(p);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable)
         throws CategoriaInvalidaException, ProductoNotFoundException {
         // Validar que la categoría no sea nula
@@ -215,6 +218,7 @@ public class ProductoServiceImp implements ProductoService {
         return result.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException {
         
         // Validar que el precio mínimo no sea mayor que el máximo y que no sean nulos
@@ -225,6 +229,7 @@ public class ProductoServiceImp implements ProductoService {
         return result.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable)
         throws NombreInvalidoException, ProductoNotFoundException {
         // Validar que el nombre no sea nulo

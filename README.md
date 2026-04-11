@@ -1,34 +1,14 @@
-# Proyecto-ecommerce_APIs
+### Panini - Sección Backend
 
-## Para que funcione todo ok
-* Crar schema en MySQLWorkbench --> marketplace
-* Crear archivo .env con lo necesario (tomar como referencia .env.example)
+## Ecommerce de venta de álbunes y figuritas
 
-## Comandos Github
+### Tecnoligias utilizadas
+- Spring
+- Security (JWT)
+- MySQL (JPA)
 
-### Ver ramas
-```bash
-git branch
-```
-
-### Cambiar a rama
-* Las ramas son: valen, mati, fran, santi
-* Si da error es porque ya estás en la rama
-```bash
-git checkout -b [nombre de la branch]
-```
-
-### Pushear en rama
-```bash
-git add .
-```
-```bash
-git commit -m "[comentario]"
-```
-```bash
-git push origin [nombre de la branch]
-```
-
-### Merge en main
-Hacerlo en github
-
+### Integrantes:
+- Valentín Mendez Morante
+- Franco Cáceres
+- Matías Abeledo
+- Santino Álvarez Campiti

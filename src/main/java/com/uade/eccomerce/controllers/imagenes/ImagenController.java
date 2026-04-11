@@ -1,5 +1,7 @@
 package com.uade.eccomerce.controllers.imagenes;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +25,17 @@ public class ImagenController {
     private ImagenServiceImp imagenService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> subirImagen(
+    public ResponseEntity<Void> subirImagenes(
             @PathVariable Long idProducto,
-            @RequestParam("archivo") MultipartFile archivo) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
-        imagenService.agregarImagenAProducto(idProducto, archivo);
+            @RequestParam("archivos") List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
+        imagenService.agregarImagenesAProducto(idProducto, archivos);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{idImagen}")
-    public ResponseEntity<Void> eliminarImagen(@PathVariable Long idImagen) throws ImagenNotFoundException {
+    public ResponseEntity<Void> eliminarImagen(
+            @PathVariable Long idProducto, 
+            @PathVariable Long idImagen) throws ImagenNotFoundException {
         imagenService.eliminarImagen(idImagen);
         return ResponseEntity.noContent().build();
     }
