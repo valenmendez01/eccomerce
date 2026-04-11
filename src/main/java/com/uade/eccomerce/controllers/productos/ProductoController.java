@@ -13,13 +13,9 @@ import com.uade.eccomerce.service.producto.ProductoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/productos")
@@ -48,13 +44,11 @@ public class ProductoController {
     }
 
     // Crear un nuevo producto
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<ProductoResponse> guardarProducto(
-            @RequestPart("producto") ProductoRequest request,
-            @RequestPart("imagenes") List<MultipartFile> imagenes) 
-            throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException {
-        ProductoResponse guardado = productoService.guardarProducto(request, imagenes);
-        return ResponseEntity.ok(guardado);
+    @PostMapping
+    public ResponseEntity<ProductoResponse> guardarProducto(@RequestBody ProductoRequest request) 
+            throws ProductoDuplicateException, UsuarioNotFoundException {
+
+        return ResponseEntity.ok(productoService.guardarProducto(request));
     }
 
     // Actualizar un producto

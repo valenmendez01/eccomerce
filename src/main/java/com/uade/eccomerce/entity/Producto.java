@@ -1,7 +1,9 @@
 package com.uade.eccomerce.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,6 +55,9 @@ public class Producto {
     @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "producto")
-    private List<ImagenProductos> imagenes;
+    // cascade = propaga operaciones de persistencia de entidad padre -> hijo
+    // orphan removal = elimina hijos cuando se elimina un padre
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImagenProductos> imagenes = new ArrayList<>();
+
 }
