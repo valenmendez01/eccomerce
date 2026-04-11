@@ -1,7 +1,10 @@
 package com.uade.eccomerce.service.producto;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
@@ -20,7 +23,7 @@ public interface ProductoService {
 
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException;
 
-    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException;
+    public ProductoResponse guardarProducto(ProductoRequest request, List<MultipartFile> archivos) throws ProductoDuplicateException, UsuarioNotFoundException, java.io.IOException, java.sql.SQLException;
 
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException;
 
