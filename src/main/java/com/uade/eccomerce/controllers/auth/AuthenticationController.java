@@ -11,6 +11,14 @@ import com.uade.eccomerce.service.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Controller para gestionar la autenticación y el registro de usuarios.
+ * Permite la creación de nuevas cuentas y la generación de tokens JWT para el acceso seguro al sistema.
+ * * Endpoints:
+ * - register() - POST /api/v1/auth/register - Registra un nuevo usuario (comprador por defecto) y devuelve su token de acceso
+ * - authenticate() - POST /api/v1/auth/authenticate - Autentica a un usuario existente validando sus credenciales y devuelve su token JWT
+ */
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

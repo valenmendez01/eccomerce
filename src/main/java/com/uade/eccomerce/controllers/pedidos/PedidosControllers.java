@@ -13,6 +13,16 @@ import com.uade.eccomerce.exceptions.productos.StockInsuficienteException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.service.pedido.PedidoService;
 
+/**
+ * Controller para gestionar los pedidos del ecommerce.
+ * Permite a los compradores generar pedidos y a los vendedores visualizar las ventas.
+ * * Endpoints:
+ * - crearPedido() - POST /pedidos - Genera un nuevo pedido, asocia los items correspondientes y descuenta el stock de los productos
+ * - obtenerTodosLosPedidos() - GET /pedidos - Devuelve el listado completo de todos los pedidos del sistema (soporta paginación)
+ * - obtenerPedidosPorUsuario() - GET /pedidos/usuario/{idUsuario} - Devuelve el historial de pedidos de un usuario específico (soporta paginación)
+ * - obtenerPedidoPorId() - GET /pedidos/{id} - Devuelve el detalle completo de un pedido por su ID
+ * - eliminarPedido() - DELETE /pedidos/{id} - Elimina un pedido
+ */
 
 @RestController
 @RequestMapping("/pedidos")
@@ -35,7 +45,6 @@ public class PedidosControllers  {
             @RequestParam(required = false) Integer size) 
             throws PedidoNotFoundException {
         
-        // Manejo de paginación por defecto si no se envían parámetros
         if (page == null || size == null) {
             return ResponseEntity.ok(pedidoService.obtenerTodosLosPedidos(PageRequest.of(0, Integer.MAX_VALUE)));
         }
@@ -50,7 +59,6 @@ public class PedidosControllers  {
             @RequestParam(required = false) Integer size) 
             throws UsuarioNotFoundException, PedidoNotFoundException {
         
-        // Manejo de paginación por defecto si no se envían parámetros
         if (page == null || size == null) {
             return ResponseEntity.ok(pedidoService.obtenerPedidosPorUsuario(idUsuario, PageRequest.of(0, Integer.MAX_VALUE)));
         }

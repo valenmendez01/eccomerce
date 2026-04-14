@@ -29,7 +29,7 @@ public class JwtService {
     }
 
     // Genera el token con los detalles del usuario, la fecha de emisión, la fecha de expiración y la firma con el secretKey
-    // aca se configura que datos se quieren incluir en el token [HACER]
+    // Acá se configura que datos se quieren incluir en el token
     private String buildToken(
             UserDetails userDetails,
             long expiration) {
