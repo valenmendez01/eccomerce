@@ -17,6 +17,14 @@ import com.uade.eccomerce.exceptions.imagenes.ImagenNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.service.imagen.ImagenServiceImp;
 
+/**
+ * Controller para la gestión de archivos e imágenes de los productos.
+ * Permite asociar imágenes a los artículos del catálogo mediante subida de archivos (multipart).
+ * * Endpoints:
+ * - subirImagenes() - POST /productos/{idProducto}/imagenes - Recibe una o múltiples imágenes (archivos) y las guarda asociadas al producto indicado
+ * - eliminarImagen() - DELETE /productos/{idProducto}/imagenes/{idImagen} - Elimina de la base de datos una imagen específica por su ID
+ */
+
 @RestController
 @RequestMapping("/productos/{idProducto}/imagenes")
 public class ImagenController {

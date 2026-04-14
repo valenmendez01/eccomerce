@@ -17,6 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controller para la gestión del catálogo de productos (álbumes, figuritas, combos).
+ * Incluye operaciones CRUD para vendedores y múltiples opciones de filtrado para compradores.
+ * * Endpoints:
+ * - getProductos() - GET /productos - Devuelve todos los productos activos del catálogo (soporta paginación)
+ * - getProductoById() - GET /productos/{id} - Devuelve el detalle específico de un producto por su ID
+ * - guardarProducto() - POST /productos - Crea un nuevo producto y lo asocia al vendedor
+ * - actualizarProducto() - PUT /productos/{id} - Actualiza la información de un producto existente
+ * - eliminarProducto() - DELETE /productos/{id} - Realiza una baja lógica (desactiva) del producto
+ * - getProductosByCategoria() - GET /productos/filtrar/{categoria} - Filtra y devuelve productos activos por su categoría (soporta paginación)
+ * - getProductosByPrecio() - GET /productos/filtrar/precio - Devuelve productos activos que se encuentren dentro de un rango de precios (min/max) (soporta paginación)
+ * - getProductosByNombre() - GET /productos/filtrar/nombre - Busca productos activos cuyo nombre contenga el texto ingresado (soporta paginación)
+ */
+
 @RestController
 @RequestMapping("/productos")
 public class ProductoController {
@@ -24,7 +38,6 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // Obtener todos los productos paginados
     @GetMapping
     public ResponseEntity<Page<ProductoResponse>> getProductos(
             @RequestParam(required = false) Integer page,
@@ -35,7 +48,6 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.getProductos(PageRequest.of(page, size)));
     }
 
-    // Obtener un producto por ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponse> getProductoById(@PathVariable Long id) 
             throws ProductoIdInvalidoException, ProductoNotFoundException {
@@ -43,7 +55,6 @@ public class ProductoController {
         return ResponseEntity.ok(producto);
     }
 
-    // Crear un nuevo producto
     @PostMapping
     public ResponseEntity<ProductoResponse> guardarProducto(@RequestBody ProductoRequest request) 
             throws ProductoDuplicateException, UsuarioNotFoundException {
@@ -51,7 +62,6 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.guardarProducto(request));
     }
 
-    // Actualizar un producto
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request)
             throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
@@ -60,7 +70,6 @@ public class ProductoController {
         return ResponseEntity.ok(actualizado);
     }
 
-    // Eliminar (desactivar) un producto
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id)
             throws ProductoNotFoundException, ProductoIdInvalidoException {
@@ -69,7 +78,6 @@ public class ProductoController {
         return ResponseEntity.noContent().build();
     }
 
-    // Filtrar por Categoría
     @GetMapping("/filtrar/{categoria}")
     public ResponseEntity<Page<ProductoResponse>> getProductosByCategoria(
             @PathVariable Categoria categoria,
@@ -83,7 +91,6 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(page, size)));
     }
 
-    // Filtrar por Rango de Precio
     @GetMapping("/filtrar/precio")
     public ResponseEntity<Page<ProductoResponse>> getProductosByPrecio(
             @RequestParam Double min,
@@ -98,7 +105,6 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(page, size)));
     }
 
-    // Buscar por Nombre
     @GetMapping("/filtrar/nombre")
     public ResponseEntity<Page<ProductoResponse>> getProductosByNombre(
             @RequestParam String nombre,

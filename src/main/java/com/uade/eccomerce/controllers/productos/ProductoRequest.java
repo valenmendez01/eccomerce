@@ -10,6 +10,6 @@ public class ProductoRequest {
     private Double precio;
     private Integer stock;
     private Integer descuento;
-    private Categoria categoria; // El Enum
-    private Long idUsuario; // Del vendedor
+    private Categoria categoria;
+    private Long idUsuario;
 }
