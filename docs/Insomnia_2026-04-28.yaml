@@ -20,7 +20,7 @@ collection:
         meta:
           id: req_7fe4d87ece094660bb160e70e5262767
           created: 1775614545069
-          modified: 1775926863085
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775616005009
@@ -46,7 +46,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjU5NjUsImV4cCI6MTc3NjAxMjM2NX0.jJ_8qw-UTxTJvGOXmIDPXSKMEqypk9BGHpd-AB_9eWR5bv83MZtHhpKnVJV0fe2adjz6Il-WjGT1hTo0frl8TA
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -108,7 +108,7 @@ collection:
         meta:
           id: req_4f9594d08f6a432a827bbd81d1a9e384
           created: 1775615171351
-          modified: 1775926442151
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775616004959
@@ -134,7 +134,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjU5NjUsImV4cCI6MTc3NjAxMjM2NX0.jJ_8qw-UTxTJvGOXmIDPXSKMEqypk9BGHpd-AB_9eWR5bv83MZtHhpKnVJV0fe2adjz6Il-WjGT1hTo0frl8TA
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -148,7 +148,7 @@ collection:
         meta:
           id: req_adeb7d01c32f45a8ba4dc5ec9f3d69bf
           created: 1775615318468
-          modified: 1775927453955
+          modified: 1777419942642
           isPrivate: false
           description: |-
             Para reactivarlo, correr en la BDD:
@@ -165,7 +165,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjU5NjUsImV4cCI6MTc3NjAxMjM2NX0.jJ_8qw-UTxTJvGOXmIDPXSKMEqypk9BGHpd-AB_9eWR5bv83MZtHhpKnVJV0fe2adjz6Il-WjGT1hTo0frl8TA
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -298,7 +298,7 @@ collection:
         meta:
           id: req_a9b067d49ecd4945aa703b06b9583484
           created: 1775670562813
-          modified: 1775912949348
+          modified: 1777419962063
           isPrivate: false
           description: ""
           sortKey: -1775616105984
@@ -409,7 +409,7 @@ collection:
         meta:
           id: req_f9478152322f4cf0aae2dc341ecf10cb
           created: 1775913139991
-          modified: 1775927495926
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775913139991
@@ -439,7 +439,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb3NtZUBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjYxMzQsImV4cCI6MTc3NjAxMjUzNH0.HdWE4ncECMDVevTfyM5JhspgNyrj03YVSax68fGDNISngPQJrCTbUCBy0I_O4ZfOoDcFnTq6rs9Jc928Mwt6Bw
+          token: "{{ _.token_comprador }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -453,7 +453,7 @@ collection:
         meta:
           id: req_5dd6b831c91e43f99f6f0def0cdc6cc9
           created: 1775923221399
-          modified: 1775927653852
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775913139891
@@ -465,7 +465,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjU5NjUsImV4cCI6MTc3NjAxMjM2NX0.jJ_8qw-UTxTJvGOXmIDPXSKMEqypk9BGHpd-AB_9eWR5bv83MZtHhpKnVJV0fe2adjz6Il-WjGT1hTo0frl8TA
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -479,7 +479,7 @@ collection:
         meta:
           id: req_f276117ea7b64c77b082a93ad962b8ee
           created: 1775923261243
-          modified: 1775927722264
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775913139791
@@ -491,7 +491,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb3NtZUBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjYxMzQsImV4cCI6MTc3NjAxMjUzNH0.HdWE4ncECMDVevTfyM5JhspgNyrj03YVSax68fGDNISngPQJrCTbUCBy0I_O4ZfOoDcFnTq6rs9Jc928Mwt6Bw
+          token: "{{ _.token_comprador }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -505,7 +505,7 @@ collection:
         meta:
           id: req_aaaef22952244540b1bd3fc5a87ac81c
           created: 1775923309926
-          modified: 1775927753614
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775913139691
@@ -517,7 +517,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb3NtZUBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjYxMzQsImV4cCI6MTc3NjAxMjUzNH0.HdWE4ncECMDVevTfyM5JhspgNyrj03YVSax68fGDNISngPQJrCTbUCBy0I_O4ZfOoDcFnTq6rs9Jc928Mwt6Bw
+          token: "{{ _.token_comprador }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -531,7 +531,7 @@ collection:
         meta:
           id: req_b63e19181edd41649ce489c4e8090b0f
           created: 1775923354601
-          modified: 1775927890260
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775913139591
@@ -543,7 +543,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjb3NtZUBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjYxMzQsImV4cCI6MTc3NjAxMjUzNH0.HdWE4ncECMDVevTfyM5JhspgNyrj03YVSax68fGDNISngPQJrCTbUCBy0I_O4ZfOoDcFnTq6rs9Jc928Mwt6Bw
+          token: "{{ _.token_comprador }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -565,7 +565,7 @@ collection:
         meta:
           id: req_8e122fc819b442b094efe0ae2275b11d
           created: 1775922963745
-          modified: 1775927300450
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775923102414
@@ -577,13 +577,13 @@ collection:
               value: ""
               description: ""
               disabled: false
-              fileName: C:\Users\Usuario\Downloads\leomessi.jpg
+              fileName: C:\Users\valen\Documents\eccomerce\docs\leomessi.jpg
               type: file
             - name: archivos
               value: ""
               description: ""
               disabled: false
-              fileName: C:\Users\Usuario\Downloads\leomessi2.jpg
+              fileName: C:\Users\valen\Documents\eccomerce\docs\leomessi2.jpg
               type: file
         headers:
           - name: User-Agent
@@ -592,7 +592,7 @@ collection:
             disabled: false
         authentication:
           type: bearer
-          token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBlamVtcGxvLmNvbSIsInJvbGUiOiJDT01QUkFET1IiLCJpYXQiOjE3NzU5MjU5NjUsImV4cCI6MTc3NjAxMjM2NX0.jJ_8qw-UTxTJvGOXmIDPXSKMEqypk9BGHpd-AB_9eWR5bv83MZtHhpKnVJV0fe2adjz6Il-WjGT1hTo0frl8TA
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -606,7 +606,7 @@ collection:
         meta:
           id: req_0c391137717e4944bdb4cfc1394b4655
           created: 1775923102314
-          modified: 1775923134545
+          modified: 1777419942642
           isPrivate: false
           description: ""
           sortKey: -1775923102314
@@ -616,6 +616,9 @@ collection:
             value: insomnia/12.5.0
             description: ""
             disabled: false
+        authentication:
+          type: bearer
+          token: "{{ _.token_vendedor }}"
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -635,5 +638,10 @@ environments:
   meta:
     id: env_0ece1a30ea904601b0800f6cc8a0c355
     created: 1775613554401
-    modified: 1775613554401
+    modified: 1777419942642
     isPrivate: false
+  data:
+    token_comprador: "{% response 'body', 'req_a9b067d49ecd4945aa703b06b9583484',
+      'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
+    token_vendedor: "{% response 'body', 'req_6dd60c9a1348420786cb4eca779408c3',
+      'b64::JC5hY2Nlc3NfdG9rZW4=::46b', 'always', 60 %}"
