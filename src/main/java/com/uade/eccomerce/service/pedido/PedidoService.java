@@ -21,6 +21,4 @@ public interface PedidoService {
 
     PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException;
 
-    void eliminarPedido(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException;
-
 }

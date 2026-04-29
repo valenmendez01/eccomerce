@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uade.eccomerce.controllers.ApiResponse;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioDuplicateException;
 import com.uade.eccomerce.service.AuthenticationService;
 
@@ -27,14 +28,16 @@ public class AuthenticationController {
     private final AuthenticationService service;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> register(
             @RequestBody RegisterRequest request) throws UsuarioDuplicateException {
-        return ResponseEntity.ok(service.register(request));
+        AuthenticationResponse response = service.register(request);
+        return ResponseEntity.ok(new ApiResponse<>("Usuario registrado exitosamente", response));
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(
             @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(service.authenticate(request));
+        AuthenticationResponse response = service.authenticate(request);
+        return ResponseEntity.ok(new ApiResponse<>("Login exitoso", response));
     }
 }

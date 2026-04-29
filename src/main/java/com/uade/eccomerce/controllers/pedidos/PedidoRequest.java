@@ -7,7 +7,6 @@ import lombok.Data;
 
 public class PedidoRequest {
 
-    private Long idUsuario;
     private List<ItemRequest> items;
 
 }

@@ -1,5 +1,6 @@
 package com.uade.eccomerce.controllers.productos;
 
+import com.uade.eccomerce.controllers.ApiResponse;
 import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
 import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
@@ -39,60 +40,64 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductoResponse>> getProductos(
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductos(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
             throws ProductoNotFoundException {
-        if (page == null || size == null)
-            return ResponseEntity.ok(productoService.getProductos(PageRequest.of(0, Integer.MAX_VALUE)));
-        return ResponseEntity.ok(productoService.getProductos(PageRequest.of(page, size)));
+        if (page == null || size == null) {
+            return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PageRequest.of(0, Integer.MAX_VALUE))));
+        }
+        
+        return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PageRequest.of(page, size))));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoResponse> getProductoById(@PathVariable Long id) 
+    public ResponseEntity<ApiResponse<ProductoResponse>> getProductoById(@PathVariable Long id) 
             throws ProductoIdInvalidoException, ProductoNotFoundException {
         ProductoResponse producto = productoService.getProductoById(id);
-        return ResponseEntity.ok(producto);
+        return ResponseEntity.ok(new ApiResponse<>("Producto obtenido correctamente", producto));
     }
 
     @PostMapping
-    public ResponseEntity<ProductoResponse> guardarProducto(@RequestBody ProductoRequest request) 
+    public ResponseEntity<ApiResponse<ProductoResponse>> guardarProducto(@RequestBody ProductoRequest request) 
             throws ProductoDuplicateException, UsuarioNotFoundException {
+        
+        ProductoResponse productoGuardado = productoService.guardarProducto(request);
 
-        return ResponseEntity.ok(productoService.guardarProducto(request));
+        return ResponseEntity.ok(new ApiResponse<>("Producto creado exitosamente", productoGuardado));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoResponse> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request)
+    public ResponseEntity<ApiResponse<ProductoResponse>> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request)
             throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
 
         ProductoResponse actualizado = productoService.actualizarProducto(id, request);
-        return ResponseEntity.ok(actualizado);
+        return ResponseEntity.ok(new ApiResponse<>("Producto actualizado correctamente", actualizado));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id)
+    @PutMapping("/{id}/desactivar")
+    public ResponseEntity<ApiResponse<Void>> eliminarProducto(@PathVariable Long id)
             throws ProductoNotFoundException, ProductoIdInvalidoException {
 
         productoService.eliminarProducto(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>("Producto eliminado correctamente", null));
     }
 
     @GetMapping("/filtrar/{categoria}")
-    public ResponseEntity<Page<ProductoResponse>> getProductosByCategoria(
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByCategoria(
             @PathVariable Categoria categoria,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) 
             throws CategoriaInvalidaException, ProductoNotFoundException {
         
         if (page == null || size == null)
-            return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(0, Integer.MAX_VALUE)));
+            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categoría", productoService.getProductosByCategoria(categoria, PageRequest.of(0, Integer.MAX_VALUE))));
         
-        return ResponseEntity.ok(productoService.getProductosByCategoria(categoria, PageRequest.of(page, size)));
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categoría", productoService.getProductosByCategoria(categoria, PageRequest.of(page, size))));
     }
 
     @GetMapping("/filtrar/precio")
-    public ResponseEntity<Page<ProductoResponse>> getProductosByPrecio(
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByPrecio(
             @RequestParam Double min,
             @RequestParam Double max,
             @RequestParam(required = false) Integer page,
@@ -100,21 +105,21 @@ public class ProductoController {
             throws PrecioInvalidoException {
         
         if (page == null || size == null)
-            return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(0, Integer.MAX_VALUE)));
+            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, PageRequest.of(0, Integer.MAX_VALUE))));
         
-        return ResponseEntity.ok(productoService.getProductosByPrecio(min, max, PageRequest.of(page, size)));
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, PageRequest.of(page, size))));
     }
 
     @GetMapping("/filtrar/nombre")
-    public ResponseEntity<Page<ProductoResponse>> getProductosByNombre(
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByNombre(
             @RequestParam String nombre,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
             throws NombreInvalidoException, ProductoNotFoundException {
         
         if (page == null || size == null)
-            return ResponseEntity.ok(productoService.getProductosByNombre(nombre, PageRequest.of(0, Integer.MAX_VALUE)));
+            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, PageRequest.of(0, Integer.MAX_VALUE))));
         
-        return ResponseEntity.ok(productoService.getProductosByNombre(nombre, PageRequest.of(page, size)));
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, PageRequest.of(page, size))));
     }
 }

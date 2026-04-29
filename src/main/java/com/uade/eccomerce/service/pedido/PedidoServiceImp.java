@@ -1,9 +1,10 @@
 package com.uade.eccomerce.service.pedido;
 
-
 import com.uade.eccomerce.service.producto.ProductoService;
 import java.sql.Date;
 import java.util.Optional;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,8 +47,12 @@ public class PedidoServiceImp implements PedidoService {
     public PedidoResponse crearPedido(PedidoRequest request)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
 
+        // 1. Obtenemos el email del usuario autenticado desde el contexto de Spring Security
+        String emailLogueado = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2. Buscamos al usuario en la base de datos usando su email
         Usuario usuario = usuarioRepository
-            .findById(request.getIdUsuario())
+            .findByEmail(emailLogueado)
             .orElseThrow(UsuarioNotFoundException::new);
 
         Pedido pedido = new Pedido();
@@ -127,19 +132,6 @@ public class PedidoServiceImp implements PedidoService {
         }
 
         return convertirAResponse(pedido.get());
-    }
-
-    @Transactional(rollbackFor = Throwable.class)
-    public void eliminarPedido(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
-        // Validamos nulidad del ID
-        if (id == null) {
-            throw new PedidoIdInvalidoException();
-        }
-        // Validamos existencia del pedido
-        if (!pedidoRepository.existsById(id)) {
-            throw new PedidoNotFoundException();
-        }
-        pedidoRepository.deleteById(id);
     }
 
     private PedidoResponse convertirAResponse(Pedido pedido) {

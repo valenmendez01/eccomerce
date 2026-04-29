@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.uade.eccomerce.controllers.ApiResponse;
 import com.uade.eccomerce.exceptions.imagenes.ImagenNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.service.imagen.ImagenServiceImp;
@@ -33,18 +34,18 @@ public class ImagenController {
     private ImagenServiceImp imagenService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> subirImagenes(
+    public ResponseEntity<ApiResponse<Void>> subirImagenes(
             @PathVariable Long idProducto,
             @RequestParam("archivos") List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
         imagenService.agregarImagenesAProducto(idProducto, archivos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new ApiResponse<>("Imágenes subidas correctamente", null));
     }
 
     @DeleteMapping("/{idImagen}")
-    public ResponseEntity<Void> eliminarImagen(
+    public ResponseEntity<ApiResponse<Void>> eliminarImagen(
             @PathVariable Long idProducto, 
             @PathVariable Long idImagen) throws ImagenNotFoundException {
         imagenService.eliminarImagen(idImagen);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>("Imagen eliminada correctamente", null));
     }
 }
