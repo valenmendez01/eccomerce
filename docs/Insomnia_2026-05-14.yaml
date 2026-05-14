@@ -627,6 +627,37 @@ collection:
             send: true
             store: true
           rebuildPath: true
+  - name: Categorias
+    meta:
+      id: fld_14bf26cedcc24d559afec3e5a87cea4d
+      created: 1778758925755
+      modified: 1778759001982
+      sortKey: -1775616097627
+      description: ""
+    children:
+      - url: http://localhost:4002/categorias
+        name: Obtener todas las categorias [ todos ]
+        meta:
+          id: req_601be05a7038452eb2f6d13ccb83fcc8
+          created: 1778758948408
+          modified: 1778758995664
+          isPrivate: false
+          description: ""
+          sortKey: -1778758948408
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.5.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
