@@ -26,6 +26,9 @@ public class ImagenProductos {
     @Column(nullable = false)
     private Blob contenido;
 
+    @Column(nullable = false)
+    private String url;
+
     // Relaciones
 
     @ManyToOne

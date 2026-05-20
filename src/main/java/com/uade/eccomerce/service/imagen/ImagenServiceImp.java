@@ -24,6 +24,15 @@ public class ImagenServiceImp implements ImagenService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    private String obtenerUrlImagen(Long idProducto, MultipartFile archivo) {
+        String nombreOriginal = archivo.getOriginalFilename();
+        String nombreSeguro = nombreOriginal == null || nombreOriginal.isBlank()
+                ? "producto-" + idProducto + "-imagen"
+                : nombreOriginal;
+
+        return nombreSeguro.length() > 255 ? nombreSeguro.substring(0, 255) : nombreSeguro;
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public void agregarImagenesAProducto(Long idProducto, List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
         
@@ -38,6 +47,7 @@ public class ImagenServiceImp implements ImagenService {
             if (!archivo.isEmpty()) { // Validamos que no esté vacío
                 ImagenProductos img = new ImagenProductos();
                 img.setContenido(new SerialBlob(archivo.getBytes()));
+                img.setUrl(obtenerUrlImagen(idProducto, archivo));
                 img.setProducto(producto); 
                 imagenRepository.save(img);
             }
