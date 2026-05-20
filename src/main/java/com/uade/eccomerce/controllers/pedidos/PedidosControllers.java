@@ -53,6 +53,17 @@ public class PedidosControllers  {
         return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(PageRequest.of(page, size))));
     }
 
+    @GetMapping("/mios")
+    public ResponseEntity<ApiResponse<Page<PedidoResponse>>> obtenerMisPedidos(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size)
+            throws UsuarioNotFoundException {
+        PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
+
+        return ResponseEntity.ok(new ApiResponse<>("Pedidos del usuario autenticado obtenidos",
+                pedidoService.obtenerMisPedidos(pageable)));
+    }
+
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<ApiResponse<Page<PedidoResponse>>> obtenerPedidosPorUsuario(
             @PathVariable Long idUsuario,

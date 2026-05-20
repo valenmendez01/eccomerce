@@ -26,6 +26,8 @@ public interface ProductoService {
 
     public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException;
 
+    public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable);
+
     public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable) throws CategoriaInvalidaException, ProductoNotFoundException;
 
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException;

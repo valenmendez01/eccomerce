@@ -17,6 +17,10 @@ public interface PedidoService {
 
     Page<PedidoResponse> obtenerTodosLosPedidos(PageRequest pageable) throws PedidoNotFoundException;
 
+    Page<PedidoResponse> obtenerMisPedidos(PageRequest pageable) throws UsuarioNotFoundException;
+
+    Page<PedidoResponse> obtenerVentasDelVendedorActual(PageRequest pageable) throws UsuarioNotFoundException;
+
     Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException;
 
     PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException;

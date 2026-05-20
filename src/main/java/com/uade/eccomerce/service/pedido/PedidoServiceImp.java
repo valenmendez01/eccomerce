@@ -2,8 +2,10 @@ package com.uade.eccomerce.service.pedido;
 
 import com.uade.eccomerce.service.producto.ProductoService;
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.eccomerce.controllers.pedidos.PedidoResponse;
+import com.uade.eccomerce.controllers.usuarios.UsuarioResponse;
 import com.uade.eccomerce.controllers.pedidos.ItemRequest;
+import com.uade.eccomerce.controllers.pedidos.ItemPedidoResponse;
 import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
 import com.uade.eccomerce.entity.DetallePedidos;
 import com.uade.eccomerce.entity.Pedido;
@@ -43,17 +47,22 @@ public class PedidoServiceImp implements PedidoService {
     @Autowired
     private ProductoService productoService;
 
+    private Usuario obtenerUsuarioAutenticado() throws UsuarioNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            throw new UsuarioNotFoundException();
+        }
+
+        return usuarioRepository.findByEmail(authentication.getName())
+            .orElseThrow(UsuarioNotFoundException::new);
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public PedidoResponse crearPedido(PedidoRequest request)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
 
-        // 1. Obtenemos el email del usuario autenticado desde el contexto de Spring Security
-        String emailLogueado = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        // 2. Buscamos al usuario en la base de datos usando su email
-        Usuario usuario = usuarioRepository
-            .findByEmail(emailLogueado)
-            .orElseThrow(UsuarioNotFoundException::new);
+        Usuario usuario = obtenerUsuarioAutenticado();
 
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
@@ -101,6 +110,24 @@ public class PedidoServiceImp implements PedidoService {
         return pedidos.map(this::convertirAResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PedidoResponse> obtenerMisPedidos(PageRequest pageable) throws UsuarioNotFoundException {
+        Usuario usuario = obtenerUsuarioAutenticado();
+
+        return pedidoRepository
+            .findByUsuarioIdUsuario(usuario.getIdUsuario(), pageable)
+            .map(this::convertirAResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PedidoResponse> obtenerVentasDelVendedorActual(PageRequest pageable) throws UsuarioNotFoundException {
+        Usuario vendedor = obtenerUsuarioAutenticado();
+
+        return pedidoRepository
+            .findDistinctByDetallePedidosProductoUsuarioEmail(vendedor.getEmail(), pageable)
+            .map(pedido -> convertirAResponse(pedido, vendedor.getEmail()));
+    }
+
     public Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException {
     
         // Validar si el usuario existe antes de buscar sus pedidos
@@ -135,13 +162,44 @@ public class PedidoServiceImp implements PedidoService {
     }
 
     private PedidoResponse convertirAResponse(Pedido pedido) {
+        return convertirAResponse(pedido, null);
+    }
+
+    private PedidoResponse convertirAResponse(Pedido pedido, String emailVendedor) {
+        List<DetallePedidos> detalles = pedido.getDetallePedidos() == null
+            ? List.of()
+            : pedido.getDetallePedidos();
+
+        if (emailVendedor != null) {
+            detalles = detalles.stream()
+                .filter(detalle -> detalle.getProducto() != null
+                    && detalle.getProducto().getUsuario() != null
+                    && emailVendedor.equals(detalle.getProducto().getUsuario().getEmail()))
+                .toList();
+        }
+
+        List<ItemPedidoResponse> items = detalles.stream()
+            .map(detalle -> ItemPedidoResponse.builder()
+                .idProducto(detalle.getProducto().getIdProducto())
+                .nombreProducto(detalle.getProducto().getNombre())
+                .cantidad(detalle.getCantidad())
+                .precioUnitario(detalle.getPrecioUnitario())
+                .subtotal(detalle.getPrecioUnitario() * detalle.getCantidad())
+                .build())
+            .toList();
+
+        Double total = emailVendedor == null
+            ? pedido.getTotal()
+            : items.stream().mapToDouble(ItemPedidoResponse::getSubtotal).sum();
 
         PedidoResponse response = new PedidoResponse();
 
         response.setIdPedido(pedido.getIdPedido());
         response.setFechaPedido(pedido.getFechaPedido());
-        response.setTotal(pedido.getTotal());
+        response.setTotal(total);
         response.setIdUsuario(pedido.getUsuario().getIdUsuario());
+        response.setComprador(UsuarioResponse.from(pedido.getUsuario()));
+        response.setItems(items);
 
         return response;
     }

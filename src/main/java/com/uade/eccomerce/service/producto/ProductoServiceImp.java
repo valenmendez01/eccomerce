@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,32 @@ public class ProductoServiceImp implements ProductoService {
 
     @Autowired 
     private UsuarioRepository usuarioRepository;
+
+    private Optional<Usuario> obtenerUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            return Optional.empty();
+        }
+
+        return usuarioRepository.findByEmail(authentication.getName());
+    }
+
+    private Usuario obtenerVendedorProducto(ProductoRequest request) throws UsuarioNotFoundException {
+        Optional<Usuario> usuarioAutenticado = obtenerUsuarioAutenticado();
+
+        if (usuarioAutenticado.isPresent()) {
+            return usuarioAutenticado.get();
+        }
+
+        Long idVendedor = request.getIdUsuario();
+        if (idVendedor == null) {
+            throw new UsuarioNotFoundException();
+        }
+
+        return usuarioRepository.findById(idVendedor)
+                .orElseThrow(UsuarioNotFoundException::new);
+    }
 
     private ProductoResponse toResponse(Producto producto) {
         // Usamos el Builder que definiste en ProductoResponse
@@ -104,16 +132,7 @@ public class ProductoServiceImp implements ProductoService {
             throw new ProductoDuplicateException();
         }
 
-        // Validamos que el vendedor exista
-        Long idVendedor = request.getIdUsuario();
-        if (idVendedor == null) {
-            throw new UsuarioNotFoundException(); 
-        }
-        // Buscamos al vendedor en el repositorio
-        Optional<Usuario> userResult = usuarioRepository.findById(idVendedor);
-        if (!userResult.isPresent()) {
-            throw new UsuarioNotFoundException();
-        }
+        Usuario vendedor = obtenerVendedorProducto(request);
 
         // Creamos una entidad vacía
         Producto producto = new Producto();
@@ -126,7 +145,7 @@ public class ProductoServiceImp implements ProductoService {
         producto.setDescuento(request.getDescuento());
         producto.setCategoria(request.getCategoria());
         producto.setActivo(true);
-        producto.setUsuario(userResult.get());
+        producto.setUsuario(vendedor);
 
         Producto guardado = productoRepository.save(producto);
 
@@ -160,17 +179,7 @@ public class ProductoServiceImp implements ProductoService {
         productoExistente.setDescuento(request.getDescuento());
         productoExistente.setCategoria(request.getCategoria());
 
-        // Si el ID de usuario cambió, buscamos al nuevo vendedor
-        Long idVendedor = request.getIdUsuario();
-        if (idVendedor != null) {
-            Optional<Usuario> userResult = usuarioRepository.findById(idVendedor);
-            
-            if (!userResult.isPresent()) {
-                throw new UsuarioNotFoundException();
-            }
-            
-            productoExistente.setUsuario(userResult.get());
-        }
+        productoExistente.setUsuario(obtenerVendedorProducto(request));
 
         // Guardamos los cambios
         return toResponse(productoRepository.save(productoExistente));
@@ -197,6 +206,11 @@ public class ProductoServiceImp implements ProductoService {
         // Realizamos la baja lógica
         p.setActivo(false);
         productoRepository.save(p);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable) {
+        return productoRepository.findByUsuarioEmail(email, pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

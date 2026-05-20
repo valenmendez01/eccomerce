@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -49,6 +50,17 @@ public class ProductoController {
         }
         
         return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PageRequest.of(page, size))));
+    }
+
+    @GetMapping("/mios")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getMisProductos(
+            Authentication authentication,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
+
+        return ResponseEntity.ok(new ApiResponse<>("Productos del vendedor obtenidos",
+                productoService.getProductosDelVendedor(authentication.getName(), pageable)));
     }
 
     @GetMapping("/{id}")

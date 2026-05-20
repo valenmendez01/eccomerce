@@ -26,4 +26,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Buscar por nombre (para el buscador del catálogo)
     Page<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre, PageRequest pageable);
 
+    Page<Producto> findByUsuarioEmail(String email, PageRequest pageable);
+
 }

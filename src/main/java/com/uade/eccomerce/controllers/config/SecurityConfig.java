@@ -39,15 +39,19 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll() // Público
                 
                 // Configuración de Productos
+                .requestMatchers(HttpMethod.GET, "/usuarios/me").authenticated()
+                .requestMatchers(HttpMethod.GET, "/productos/mios").hasAuthority(Rol.VENDEDOR.name())
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Público
                 .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
                 .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
 
                 // Configuración de Pedidos
                 .requestMatchers(HttpMethod.POST, "/pedidos", "/pedidos/").hasAuthority(Rol.COMPRADOR.name())
+                .requestMatchers(HttpMethod.GET, "/pedidos/mios").hasAuthority(Rol.COMPRADOR.name())
                 .requestMatchers(HttpMethod.GET, "/pedidos/usuario/**").hasAuthority(Rol.COMPRADOR.name()) // Comprador ve sus pedidos
                 .requestMatchers(HttpMethod.GET, "/pedidos/{id}").hasAnyAuthority(Rol.COMPRADOR.name(), Rol.VENDEDOR.name()) // Detalle compra
                 .requestMatchers(HttpMethod.GET, "/pedidos").hasAuthority(Rol.VENDEDOR.name())
+                .requestMatchers(HttpMethod.GET, "/ventas/mias").hasAuthority(Rol.VENDEDOR.name())
 
                 // Cualquier otra ruta requiere estar autenticado
                 .anyRequest().authenticated()

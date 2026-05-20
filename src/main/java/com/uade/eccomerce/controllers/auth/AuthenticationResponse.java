@@ -1,6 +1,7 @@
 package com.uade.eccomerce.controllers.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uade.eccomerce.controllers.usuarios.UsuarioResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,4 +16,5 @@ public class AuthenticationResponse {
 
     @JsonProperty("access_token")
     private String accessToken;
+    private UsuarioResponse usuario;
 }

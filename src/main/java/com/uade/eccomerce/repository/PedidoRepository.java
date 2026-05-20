@@ -13,4 +13,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     
     Page<Pedido> findByUsuarioIdUsuario(Long idUsuario, PageRequest pageable);
 
+    Page<Pedido> findDistinctByDetallePedidosProductoUsuarioEmail(String email, PageRequest pageable);
+
 }
