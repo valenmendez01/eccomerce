@@ -84,6 +84,7 @@ public class ProductoServiceImp implements ProductoService {
                             byte[] bytes = img.getContenido().getBytes(1, (int) img.getContenido().length());
                             return ImagenResponse.builder()
                                     .idImagen(img.getIdImagen()) // El ID es clave para el front
+                                    .url(img.getUrl())
                                     .contenidoBase64(java.util.Base64.getEncoder().encodeToString(bytes))
                                     .build();
                         } catch (Exception e) {
