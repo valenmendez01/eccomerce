@@ -179,6 +179,9 @@ public class ProductoServiceImp implements ProductoService {
         productoExistente.setStock(request.getStock());
         productoExistente.setDescuento(request.getDescuento());
         productoExistente.setCategoria(request.getCategoria());
+        if (request.getActivo() != null) {
+            productoExistente.setActivo(request.getActivo());
+        }
 
         productoExistente.setUsuario(obtenerVendedorProducto(request));
 

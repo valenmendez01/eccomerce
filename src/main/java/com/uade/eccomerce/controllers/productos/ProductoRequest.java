@@ -12,4 +12,5 @@ public class ProductoRequest {
     private Integer descuento;
     private Categoria categoria;
     private Long idUsuario;
+    private Boolean activo;
 }
