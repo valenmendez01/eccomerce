@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.uade.eccomerce.controllers.ApiResponse;
+import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.pedidos.PedidoIdInvalidoException;
 import com.uade.eccomerce.exceptions.pedidos.PedidoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
@@ -34,6 +35,23 @@ public class PedidosControllers  {
     @Autowired
     private PedidoService pedidoService;
 
+    private PageRequest crearPageRequest(Integer page, Integer size) {
+        int pagina = page == null ? 0 : page;
+        int tamanio = size == null ? Integer.MAX_VALUE : size;
+
+        if (pagina < 0 || tamanio <= 0) {
+            throw new SolicitudInvalidaException("La paginacion es invalida.");
+        }
+
+        return PageRequest.of(pagina, tamanio);
+    }
+
+    private boolean esVendedor(Authentication authentication) {
+        return authentication != null
+                && authentication.getAuthorities().stream()
+                        .anyMatch(autoridad -> "VENDEDOR".equals(autoridad.getAuthority()));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<PedidoResponse>> crearPedido(@RequestBody PedidoRequest request, Authentication authentication)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
@@ -48,10 +66,10 @@ public class PedidosControllers  {
             throws PedidoNotFoundException {
         
         if (page == null || size == null) {
-            return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(PageRequest.of(0, Integer.MAX_VALUE))));
+            return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(crearPageRequest(page, size))));
         }
         
-        return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(PageRequest.of(page, size))));
+        return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(crearPageRequest(page, size))));
     }
 
     @GetMapping("/comprador")
@@ -60,7 +78,7 @@ public class PedidosControllers  {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
             throws UsuarioNotFoundException {
-        PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
+        PageRequest pageable = crearPageRequest(page, size);
 
         return ResponseEntity.ok(new ApiResponse<>("Pedidos del usuario autenticado obtenidos",
                 pedidoService.obtenerPedidosDelComprador(authentication == null ? null : authentication.getName(), pageable)));
@@ -69,20 +87,21 @@ public class PedidosControllers  {
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<ApiResponse<Page<PedidoResponse>>> obtenerPedidosPorUsuario(
             @PathVariable Long idUsuario,
+            Authentication authentication,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) 
             throws UsuarioNotFoundException, PedidoNotFoundException {
         
         if (page == null || size == null) {
-            return ResponseEntity.ok(new ApiResponse<>("Historial de pedidos del usuario obtenido", pedidoService.obtenerPedidosPorUsuario(idUsuario, PageRequest.of(0, Integer.MAX_VALUE))));
+            return ResponseEntity.ok(new ApiResponse<>("Historial de pedidos del usuario obtenido", pedidoService.obtenerPedidosPorUsuario(idUsuario, authentication == null ? null : authentication.getName(), crearPageRequest(page, size))));
         }
         
-        return ResponseEntity.ok(new ApiResponse<>("Historial de pedidos del usuario obtenido", pedidoService.obtenerPedidosPorUsuario(idUsuario, PageRequest.of(page, size))));
+        return ResponseEntity.ok(new ApiResponse<>("Historial de pedidos del usuario obtenido", pedidoService.obtenerPedidosPorUsuario(idUsuario, authentication == null ? null : authentication.getName(), crearPageRequest(page, size))));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PedidoResponse>> obtenerPedidoPorId(@PathVariable Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
-        return ResponseEntity.ok(new ApiResponse<>("Detalle del pedido obtenido", pedidoService.obtenerPedidoPorId(id)));
+    public ResponseEntity<ApiResponse<PedidoResponse>> obtenerPedidoPorId(@PathVariable Long id, Authentication authentication) throws PedidoIdInvalidoException, PedidoNotFoundException {
+        return ResponseEntity.ok(new ApiResponse<>("Detalle del pedido obtenido", pedidoService.obtenerPedidoPorId(id, authentication == null ? null : authentication.getName(), esVendedor(authentication))));
     }
 
 }

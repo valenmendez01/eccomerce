@@ -20,6 +20,8 @@ import com.uade.eccomerce.entity.DetallePedidos;
 import com.uade.eccomerce.entity.Pedido;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Usuario;
+import com.uade.eccomerce.exceptions.AccesoPedidoNoAutorizadoException;
+import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.pedidos.PedidoIdInvalidoException;
 import com.uade.eccomerce.exceptions.pedidos.PedidoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
@@ -53,10 +55,27 @@ public class PedidoServiceImp implements PedidoService {
             .orElseThrow(UsuarioNotFoundException::new);
     }
 
+    private void validarPedido(PedidoRequest request) {
+        if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+            throw new SolicitudInvalidaException("El pedido debe tener al menos un producto.");
+        }
+
+        for (ItemRequest item : request.getItems()) {
+            if (item == null || item.getIdProducto() == null) {
+                throw new SolicitudInvalidaException("Cada item debe tener un producto valido.");
+            }
+
+            if (item.getCantidad() == null || item.getCantidad() <= 0) {
+                throw new SolicitudInvalidaException("La cantidad de cada item debe ser mayor a cero.");
+            }
+        }
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public PedidoResponse crearPedido(PedidoRequest request, String emailComprador)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
 
+        validarPedido(request);
         Usuario usuario = obtenerUsuarioPorEmail(emailComprador);
 
         Pedido pedido = new Pedido();
@@ -123,8 +142,13 @@ public class PedidoServiceImp implements PedidoService {
             .map(pedido -> convertirAResponse(pedido, vendedor.getEmail()));
     }
 
-    public Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException {
+    public Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, String emailComprador, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException {
     
+        Usuario usuario = obtenerUsuarioPorEmail(emailComprador);
+        if (!usuario.getIdUsuario().equals(idUsuario)) {
+            throw new AccesoPedidoNoAutorizadoException();
+        }
+
         // Validar si el usuario existe antes de buscar sus pedidos
         if (!usuarioRepository.existsById(idUsuario)) {
             throw new UsuarioNotFoundException();
@@ -140,7 +164,7 @@ public class PedidoServiceImp implements PedidoService {
         return pedidos.map(this::convertirAResponse);
     }
 
-    public PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException {
+    public PedidoResponse obtenerPedidoPorId(Long id, String emailUsuario, boolean esVendedor) throws PedidoIdInvalidoException, PedidoNotFoundException {
         // Validamos nulidad del ID
         if (id == null) {
             throw new PedidoIdInvalidoException();
@@ -153,7 +177,12 @@ public class PedidoServiceImp implements PedidoService {
             throw new PedidoNotFoundException();
         }
 
-        return convertirAResponse(pedido.get());
+        Pedido pedidoEncontrado = pedido.get();
+        if (!esVendedor && !pedidoEncontrado.getUsuario().getEmail().equals(emailUsuario)) {
+            throw new AccesoPedidoNoAutorizadoException();
+        }
+
+        return convertirAResponse(pedidoEncontrado);
     }
 
     private PedidoResponse convertirAResponse(Pedido pedido) {
