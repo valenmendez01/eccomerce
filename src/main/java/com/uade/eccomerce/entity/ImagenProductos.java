@@ -23,11 +23,11 @@ public class ImagenProductos {
     private Long idImagen;
 
     @Lob // Anotación para objetos grandes
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
     private Blob contenido;
 
-    @Column(nullable = false)
-    private String url;
+    @Column(name = "url", nullable = true)
+    private String nombreArchivo;
 
     // Relaciones
 

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.uade.eccomerce.controllers.ApiResponse;
@@ -34,9 +35,9 @@ public class PedidosControllers  {
     private PedidoService pedidoService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PedidoResponse>> crearPedido(@RequestBody PedidoRequest request)
+    public ResponseEntity<ApiResponse<PedidoResponse>> crearPedido(@RequestBody PedidoRequest request, Authentication authentication)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
-        PedidoResponse response = pedidoService.crearPedido(request);
+        PedidoResponse response = pedidoService.crearPedido(request, authentication == null ? null : authentication.getName());
         return ResponseEntity.ok(new ApiResponse<>("Pedido creado con éxito", response));
     }
 
@@ -53,15 +54,16 @@ public class PedidosControllers  {
         return ResponseEntity.ok(new ApiResponse<>("Listado de pedidos obtenido", pedidoService.obtenerTodosLosPedidos(PageRequest.of(page, size))));
     }
 
-    @GetMapping("/mios")
-    public ResponseEntity<ApiResponse<Page<PedidoResponse>>> obtenerMisPedidos(
+    @GetMapping("/comprador")
+    public ResponseEntity<ApiResponse<Page<PedidoResponse>>> obtenerPedidosDelComprador(
+            Authentication authentication,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
             throws UsuarioNotFoundException {
         PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
 
         return ResponseEntity.ok(new ApiResponse<>("Pedidos del usuario autenticado obtenidos",
-                pedidoService.obtenerMisPedidos(pageable)));
+                pedidoService.obtenerPedidosDelComprador(authentication == null ? null : authentication.getName(), pageable)));
     }
 
     @GetMapping("/usuario/{idUsuario}")

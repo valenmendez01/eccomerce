@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.uade.eccomerce.controllers.ApiResponse;
 import com.uade.eccomerce.exceptions.imagenes.ImagenNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
-import com.uade.eccomerce.service.imagen.ImagenServiceImp;
+import com.uade.eccomerce.service.imagen.ImagenService;
 
 /**
  * Controller para la gestión de archivos e imágenes de los productos.
@@ -31,7 +31,7 @@ import com.uade.eccomerce.service.imagen.ImagenServiceImp;
 public class ImagenController {
 
     @Autowired
-    private ImagenServiceImp imagenService;
+    private ImagenService imagenService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> subirImagenes(

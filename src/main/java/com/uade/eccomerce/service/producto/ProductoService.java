@@ -20,9 +20,9 @@ public interface ProductoService {
 
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException;
 
-    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException;
+    public ProductoResponse guardarProducto(ProductoRequest request, String emailVendedor) throws ProductoDuplicateException, UsuarioNotFoundException;
 
-    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException;
+    public ProductoResponse actualizarProducto(Long id, ProductoRequest request, String emailVendedor) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException;
 
     public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException;
 

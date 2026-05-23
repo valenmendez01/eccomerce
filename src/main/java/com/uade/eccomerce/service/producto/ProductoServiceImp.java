@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,29 +33,12 @@ public class ProductoServiceImp implements ProductoService {
     @Autowired 
     private UsuarioRepository usuarioRepository;
 
-    private Optional<Usuario> obtenerUsuarioAutenticado() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || authentication.getName() == null) {
-            return Optional.empty();
-        }
-
-        return usuarioRepository.findByEmail(authentication.getName());
-    }
-
-    private Usuario obtenerVendedorProducto(ProductoRequest request) throws UsuarioNotFoundException {
-        Optional<Usuario> usuarioAutenticado = obtenerUsuarioAutenticado();
-
-        if (usuarioAutenticado.isPresent()) {
-            return usuarioAutenticado.get();
-        }
-
-        Long idVendedor = request.getIdUsuario();
-        if (idVendedor == null) {
+    private Usuario obtenerVendedorProducto(String emailVendedor) throws UsuarioNotFoundException {
+        if (emailVendedor == null || emailVendedor.isBlank()) {
             throw new UsuarioNotFoundException();
         }
 
-        return usuarioRepository.findById(idVendedor)
+        return usuarioRepository.findByEmail(emailVendedor)
                 .orElseThrow(UsuarioNotFoundException::new);
     }
 
@@ -84,7 +65,6 @@ public class ProductoServiceImp implements ProductoService {
                             byte[] bytes = img.getContenido().getBytes(1, (int) img.getContenido().length());
                             return ImagenResponse.builder()
                                     .idImagen(img.getIdImagen()) // El ID es clave para el front
-                                    .url(img.getUrl())
                                     .contenidoBase64(java.util.Base64.getEncoder().encodeToString(bytes))
                                     .build();
                         } catch (Exception e) {
@@ -126,14 +106,14 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public ProductoResponse guardarProducto(ProductoRequest request) throws ProductoDuplicateException, UsuarioNotFoundException {
+    public ProductoResponse guardarProducto(ProductoRequest request, String emailVendedor) throws ProductoDuplicateException, UsuarioNotFoundException {
 
         // Validamos que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(request.getNombre())) {
             throw new ProductoDuplicateException();
         }
 
-        Usuario vendedor = obtenerVendedorProducto(request);
+        Usuario vendedor = obtenerVendedorProducto(emailVendedor);
 
         // Creamos una entidad vacía
         Producto producto = new Producto();
@@ -154,7 +134,7 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
+    public ProductoResponse actualizarProducto(Long id, ProductoRequest request, String emailVendedor) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
 
         // Validamos nulidad del ID
         if (id == null) {
@@ -183,7 +163,7 @@ public class ProductoServiceImp implements ProductoService {
             productoExistente.setActivo(request.getActivo());
         }
 
-        productoExistente.setUsuario(obtenerVendedorProducto(request));
+        productoExistente.setUsuario(obtenerVendedorProducto(emailVendedor));
 
         // Guardamos los cambios
         return toResponse(productoRepository.save(productoExistente));

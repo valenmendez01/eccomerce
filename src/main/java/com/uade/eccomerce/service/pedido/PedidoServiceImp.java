@@ -5,9 +5,6 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,22 +44,20 @@ public class PedidoServiceImp implements PedidoService {
     @Autowired
     private ProductoService productoService;
 
-    private Usuario obtenerUsuarioAutenticado() throws UsuarioNotFoundException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || authentication.getName() == null) {
+    private Usuario obtenerUsuarioPorEmail(String email) throws UsuarioNotFoundException {
+        if (email == null || email.isBlank()) {
             throw new UsuarioNotFoundException();
         }
 
-        return usuarioRepository.findByEmail(authentication.getName())
+        return usuarioRepository.findByEmail(email)
             .orElseThrow(UsuarioNotFoundException::new);
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public PedidoResponse crearPedido(PedidoRequest request)
+    public PedidoResponse crearPedido(PedidoRequest request, String emailComprador)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
 
-        Usuario usuario = obtenerUsuarioAutenticado();
+        Usuario usuario = obtenerUsuarioPorEmail(emailComprador);
 
         Pedido pedido = new Pedido();
         pedido.setUsuario(usuario);
@@ -111,8 +106,8 @@ public class PedidoServiceImp implements PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PedidoResponse> obtenerMisPedidos(PageRequest pageable) throws UsuarioNotFoundException {
-        Usuario usuario = obtenerUsuarioAutenticado();
+    public Page<PedidoResponse> obtenerPedidosDelComprador(String emailComprador, PageRequest pageable) throws UsuarioNotFoundException {
+        Usuario usuario = obtenerUsuarioPorEmail(emailComprador);
 
         return pedidoRepository
             .findByUsuarioIdUsuario(usuario.getIdUsuario(), pageable)
@@ -120,8 +115,8 @@ public class PedidoServiceImp implements PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PedidoResponse> obtenerVentasDelVendedorActual(PageRequest pageable) throws UsuarioNotFoundException {
-        Usuario vendedor = obtenerUsuarioAutenticado();
+    public Page<PedidoResponse> obtenerVentasDelVendedor(String emailVendedor, PageRequest pageable) throws UsuarioNotFoundException {
+        Usuario vendedor = obtenerUsuarioPorEmail(emailVendedor);
 
         return pedidoRepository
             .findDistinctByDetallePedidosProductoUsuarioEmail(vendedor.getEmail(), pageable)

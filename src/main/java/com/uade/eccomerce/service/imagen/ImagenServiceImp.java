@@ -24,7 +24,7 @@ public class ImagenServiceImp implements ImagenService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    private String obtenerUrlImagen(Long idProducto, MultipartFile archivo) {
+    private String obtenerNombreArchivo(Long idProducto, MultipartFile archivo) {
         String nombreOriginal = archivo.getOriginalFilename();
         String nombreSeguro = nombreOriginal == null || nombreOriginal.isBlank()
                 ? "producto-" + idProducto + "-imagen"
@@ -47,7 +47,7 @@ public class ImagenServiceImp implements ImagenService {
             if (!archivo.isEmpty()) { // Validamos que no esté vacío
                 ImagenProductos img = new ImagenProductos();
                 img.setContenido(new SerialBlob(archivo.getBytes()));
-                img.setUrl(obtenerUrlImagen(idProducto, archivo));
+                img.setNombreArchivo(obtenerNombreArchivo(idProducto, archivo));
                 img.setProducto(producto); 
                 imagenRepository.save(img);
             }

@@ -52,15 +52,15 @@ public class ProductoController {
         return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PageRequest.of(page, size))));
     }
 
-    @GetMapping("/mios")
-    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getMisProductos(
+    @GetMapping("/vendedor")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosDelVendedor(
             Authentication authentication,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
 
         return ResponseEntity.ok(new ApiResponse<>("Productos del vendedor obtenidos",
-                productoService.getProductosDelVendedor(authentication.getName(), pageable)));
+                productoService.getProductosDelVendedor(authentication == null ? null : authentication.getName(), pageable)));
     }
 
     @GetMapping("/{id}")
@@ -71,19 +71,19 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductoResponse>> guardarProducto(@RequestBody ProductoRequest request) 
+    public ResponseEntity<ApiResponse<ProductoResponse>> guardarProducto(@RequestBody ProductoRequest request, Authentication authentication)
             throws ProductoDuplicateException, UsuarioNotFoundException {
         
-        ProductoResponse productoGuardado = productoService.guardarProducto(request);
+        ProductoResponse productoGuardado = productoService.guardarProducto(request, authentication == null ? null : authentication.getName());
 
         return ResponseEntity.ok(new ApiResponse<>("Producto creado exitosamente", productoGuardado));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductoResponse>> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request)
+    public ResponseEntity<ApiResponse<ProductoResponse>> actualizarProducto(@PathVariable Long id, @RequestBody ProductoRequest request, Authentication authentication)
             throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
 
-        ProductoResponse actualizado = productoService.actualizarProducto(id, request);
+        ProductoResponse actualizado = productoService.actualizarProducto(id, request, authentication == null ? null : authentication.getName());
         return ResponseEntity.ok(new ApiResponse<>("Producto actualizado correctamente", actualizado));
     }
 

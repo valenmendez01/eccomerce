@@ -13,13 +13,13 @@ import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
 
 public interface PedidoService {
 
-    PedidoResponse crearPedido(PedidoRequest request) throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException;
+    PedidoResponse crearPedido(PedidoRequest request, String emailComprador) throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException;
 
     Page<PedidoResponse> obtenerTodosLosPedidos(PageRequest pageable) throws PedidoNotFoundException;
 
-    Page<PedidoResponse> obtenerMisPedidos(PageRequest pageable) throws UsuarioNotFoundException;
+    Page<PedidoResponse> obtenerPedidosDelComprador(String emailComprador, PageRequest pageable) throws UsuarioNotFoundException;
 
-    Page<PedidoResponse> obtenerVentasDelVendedorActual(PageRequest pageable) throws UsuarioNotFoundException;
+    Page<PedidoResponse> obtenerVentasDelVendedor(String emailVendedor, PageRequest pageable) throws UsuarioNotFoundException;
 
     Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException;
 

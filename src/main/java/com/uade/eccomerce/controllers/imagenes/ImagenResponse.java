@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImagenResponse {
     private Long idImagen;
-    private String url;
     private String contenidoBase64;
 }

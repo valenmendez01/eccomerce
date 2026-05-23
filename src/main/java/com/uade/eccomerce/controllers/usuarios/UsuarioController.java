@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.eccomerce.controllers.ApiResponse;
-import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
-import com.uade.eccomerce.repository.UsuarioRepository;
+import com.uade.eccomerce.service.usuario.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,18 +17,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    @GetMapping("/me")
+    @GetMapping("/actual")
     public ResponseEntity<ApiResponse<UsuarioResponse>> obtenerUsuarioActual(Authentication authentication)
             throws UsuarioNotFoundException {
-        if (authentication == null) {
-            throw new UsuarioNotFoundException();
-        }
-
-        Usuario usuario = usuarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(UsuarioNotFoundException::new);
-
-        return ResponseEntity.ok(new ApiResponse<>("Usuario autenticado obtenido", UsuarioResponse.from(usuario)));
+        String email = authentication == null ? null : authentication.getName();
+        return ResponseEntity.ok(new ApiResponse<>("Usuario autenticado obtenido",
+                usuarioService.obtenerUsuarioPorEmail(email)));
     }
 }
