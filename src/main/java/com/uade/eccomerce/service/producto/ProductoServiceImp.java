@@ -14,6 +14,7 @@ import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Usuario;
+import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
 import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
@@ -40,6 +41,36 @@ public class ProductoServiceImp implements ProductoService {
 
         return usuarioRepository.findByEmail(emailVendedor)
                 .orElseThrow(UsuarioNotFoundException::new);
+    }
+
+    private void validarProducto(ProductoRequest request) {
+        if (request == null) {
+            throw new SolicitudInvalidaException("Los datos del producto son obligatorios.");
+        }
+
+        if (request.getNombre() == null || request.getNombre().trim().isEmpty()) {
+            throw new SolicitudInvalidaException("El nombre del producto es obligatorio.");
+        }
+
+        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
+            throw new SolicitudInvalidaException("La descripcion del producto es obligatoria.");
+        }
+
+        if (request.getCategoria() == null) {
+            throw new SolicitudInvalidaException("La categoria del producto es obligatoria.");
+        }
+
+        if (request.getPrecio() == null || request.getPrecio() <= 0) {
+            throw new SolicitudInvalidaException("El precio debe ser mayor a cero.");
+        }
+
+        if (request.getStock() == null || request.getStock() < 0) {
+            throw new SolicitudInvalidaException("El stock no puede ser negativo.");
+        }
+
+        if (request.getDescuento() == null || request.getDescuento() < 0 || request.getDescuento() > 100) {
+            throw new SolicitudInvalidaException("El descuento debe estar entre 0 y 100.");
+        }
     }
 
     private ProductoResponse toResponse(Producto producto) {
@@ -97,7 +128,7 @@ public class ProductoServiceImp implements ProductoService {
         Optional<Producto> result = productoRepository.findById(id);
 
         // Validamos si se encontró el producto
-        if (!result.isPresent()) {
+        if (!result.isPresent() || !result.get().getActivo()) {
             throw new ProductoNotFoundException();
         }
 
@@ -107,6 +138,7 @@ public class ProductoServiceImp implements ProductoService {
 
     @Transactional(rollbackFor = Throwable.class)
     public ProductoResponse guardarProducto(ProductoRequest request, String emailVendedor) throws ProductoDuplicateException, UsuarioNotFoundException {
+        validarProducto(request);
 
         // Validamos que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(request.getNombre())) {
@@ -135,6 +167,7 @@ public class ProductoServiceImp implements ProductoService {
 
     @Transactional(rollbackFor = Throwable.class)
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, String emailVendedor) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
+        validarProducto(request);
 
         // Validamos nulidad del ID
         if (id == null) {
@@ -220,7 +253,7 @@ public class ProductoServiceImp implements ProductoService {
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException {
         
         // Validar que el precio mínimo no sea mayor que el máximo y que no sean nulos
-        if (min == null || max == null || min > max) {
+        if (min == null || max == null || min < 0 || max < 0 || min > max) {
             throw new PrecioInvalidoException();
         }
         Page<Producto> result = productoRepository.findByPrecioBetweenAndActivoTrue(min, max, pageable);
@@ -247,6 +280,9 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     public boolean tieneStock(Long id, Integer cantidadSolicitada) throws ProductoNotFoundException {
+        if (cantidadSolicitada == null || cantidadSolicitada <= 0) {
+            return false;
+        }
         
         Optional<Producto> result = productoRepository.findById(id);
 

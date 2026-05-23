@@ -8,6 +8,7 @@ import com.uade.eccomerce.exceptions.usuarios.*;
 import com.uade.eccomerce.exceptions.pedidos.PedidoIdInvalidoException;
 import com.uade.eccomerce.exceptions.pedidos.PedidoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.*;
+import com.uade.eccomerce.exceptions.AccesoPedidoNoAutorizadoException;
 import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
 
 
@@ -21,8 +22,8 @@ public interface PedidoService {
 
     Page<PedidoResponse> obtenerVentasDelVendedor(String emailVendedor, PageRequest pageable) throws UsuarioNotFoundException;
 
-    Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException;
+    Page<PedidoResponse> obtenerPedidosPorUsuario(Long idUsuario, String emailComprador, PageRequest pageable) throws UsuarioNotFoundException, PedidoNotFoundException, AccesoPedidoNoAutorizadoException;
 
-    PedidoResponse obtenerPedidoPorId(Long id) throws PedidoIdInvalidoException, PedidoNotFoundException;
+    PedidoResponse obtenerPedidoPorId(Long id, String emailUsuario, boolean esVendedor) throws PedidoIdInvalidoException, PedidoNotFoundException, AccesoPedidoNoAutorizadoException;
 
 }
