@@ -1,5 +1,6 @@
 package com.uade.eccomerce.service.producto;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,21 +232,15 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable)
+    public Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable)
         throws CategoriaInvalidaException, ProductoNotFoundException {
-        // Validar que la categoría no sea nula
-        if (categoria == null) {
+        if (categorias == null || categorias.isEmpty()) {
             throw new CategoriaInvalidaException();
         }
-
-        // Realizar la búsqueda
-        Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categoria, pageable);
-
-        // Validar si la página está vacía
+        Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categorias, pageable);
         if (result.isEmpty()) {
             throw new ProductoNotFoundException();
         }
-
         return result.map(this::toResponse);
     }
 

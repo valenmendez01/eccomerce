@@ -1,5 +1,7 @@
 package com.uade.eccomerce.service.producto;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -28,7 +30,7 @@ public interface ProductoService {
 
     public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable);
 
-    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable) throws CategoriaInvalidaException, ProductoNotFoundException;
+    Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable) throws CategoriaInvalidaException, ProductoNotFoundException;
 
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException;
 
