@@ -15,6 +15,8 @@ import com.uade.eccomerce.service.producto.ProductoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -107,17 +109,15 @@ public class ProductoController {
         return ResponseEntity.ok(new ApiResponse<>("Producto eliminado correctamente", null));
     }
 
-    @GetMapping("/filtrar/{categoria}")
-    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByCategoria(
-            @PathVariable Categoria categoria,
+    @GetMapping("/filtrar/categorias")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByCategorias(
+            @RequestParam List<Categoria> categorias,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) 
+            @RequestParam(required = false) Integer size)
             throws CategoriaInvalidaException, ProductoNotFoundException {
-        
-        if (page == null || size == null)
-            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categoría", productoService.getProductosByCategoria(categoria, crearPageRequest(page, size))));
-        
-        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categoría", productoService.getProductosByCategoria(categoria, crearPageRequest(page, size))));
+
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categorías",
+                productoService.getProductosByCategorias(categorias, crearPageRequest(page, size))));
     }
 
     @GetMapping("/filtrar/precio")
