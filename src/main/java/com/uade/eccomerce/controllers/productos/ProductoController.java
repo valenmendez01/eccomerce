@@ -11,6 +11,8 @@ import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
 import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.service.producto.ProductoService;
+import com.uade.eccomerce.entity.Seleccion;
+import com.uade.eccomerce.exceptions.productos.filtros.SeleccionInvalidaException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -118,6 +120,17 @@ public class ProductoController {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categorías",
                 productoService.getProductosByCategorias(categorias, crearPageRequest(page, size))));
+    }
+
+    @GetMapping("/filtrar/selecciones")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosBySelecciones(
+            @RequestParam List<Seleccion> selecciones,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size)
+            throws SeleccionInvalidaException, ProductoNotFoundException {
+
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por selecciones",
+                productoService.getProductosBySelecciones(selecciones, crearPageRequest(page, size))));
     }
 
     @GetMapping("/filtrar/precio")

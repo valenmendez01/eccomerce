@@ -8,12 +8,14 @@ import org.springframework.data.domain.PageRequest;
 import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
+import com.uade.eccomerce.entity.Seleccion;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
 import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.filtros.CategoriaInvalidaException;
 import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
 import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
+import com.uade.eccomerce.exceptions.productos.filtros.SeleccionInvalidaException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 
 public interface ProductoService {
@@ -31,6 +33,8 @@ public interface ProductoService {
     public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable);
 
     Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable) throws CategoriaInvalidaException, ProductoNotFoundException;
+
+    Page<ProductoResponse> getProductosBySelecciones(List<Seleccion> selecciones, PageRequest pageable) throws SeleccionInvalidaException, ProductoNotFoundException;
 
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException;
 
