@@ -20,7 +20,7 @@ import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 
 public interface ProductoService {
 
-    public Page<ProductoResponse> getProductos(PageRequest pageable) throws ProductoNotFoundException;
+    public Page<ProductoResponse> getProductos(PageRequest pageable);
 
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException;
 
@@ -32,13 +32,13 @@ public interface ProductoService {
 
     public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable);
 
-    Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable) throws CategoriaInvalidaException, ProductoNotFoundException;
+    Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable) throws CategoriaInvalidaException;
 
-    Page<ProductoResponse> getProductosBySelecciones(List<Seleccion> selecciones, PageRequest pageable) throws SeleccionInvalidaException, ProductoNotFoundException;
+    Page<ProductoResponse> getProductosBySelecciones(List<Seleccion> selecciones, PageRequest pageable) throws SeleccionInvalidaException;
 
     public Page<ProductoResponse> getProductosByPrecio(Double min, Double max, PageRequest pageable) throws PrecioInvalidoException;
 
-    public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable) throws NombreInvalidoException, ProductoNotFoundException;
+    public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable) throws NombreInvalidoException;
 
     boolean tieneStock(Long id, Integer cantidadSolicitada) throws ProductoNotFoundException;
 

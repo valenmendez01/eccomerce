@@ -111,12 +111,10 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductoResponse> getProductos(PageRequest pageable) throws ProductoNotFoundException {
+    public Page<ProductoResponse> getProductos(PageRequest pageable) {
         // Buscamos los productos en el repositorio
         Page<Producto> productos = productoRepository.findByActivoTrue(pageable);
-        if (productos.isEmpty()) {
-            throw new ProductoNotFoundException();
-        }
+ 
         // Mapeamos cada Producto a ProductoResponse
         return productos.map(this::toResponse);
     }
@@ -245,27 +243,23 @@ public class ProductoServiceImp implements ProductoService {
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable)
-        throws CategoriaInvalidaException, ProductoNotFoundException {
+        throws CategoriaInvalidaException {
         if (categorias == null || categorias.isEmpty()) {
             throw new CategoriaInvalidaException();
         }
         Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categorias, pageable);
-        if (result.isEmpty()) {
-            throw new ProductoNotFoundException();
-        }
+
         return result.map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosBySelecciones(List<Seleccion> selecciones, PageRequest pageable)
-        throws SeleccionInvalidaException, ProductoNotFoundException {
+        throws SeleccionInvalidaException {
         if (selecciones == null || selecciones.isEmpty()) {
             throw new SeleccionInvalidaException();
         }
         Page<Producto> result = productoRepository.findBySeleccionInAndActivoTrue(selecciones, pageable);
-        if (result.isEmpty()) {
-            throw new ProductoNotFoundException();
-        }
+        
         return result.map(this::toResponse);
     }
 
@@ -282,7 +276,7 @@ public class ProductoServiceImp implements ProductoService {
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getProductosByNombre(String nombre, PageRequest pageable)
-        throws NombreInvalidoException, ProductoNotFoundException {
+        throws NombreInvalidoException {
         // Validar que el nombre no sea nulo
         if (nombre == null) {
             throw new NombreInvalidoException();
@@ -290,11 +284,6 @@ public class ProductoServiceImp implements ProductoService {
 
         // Realizar la búsqueda
         Page<Producto> result = productoRepository.findByNombreContainingIgnoreCaseAndActivoTrue(nombre, pageable);
-
-        // Validar si la página está vacía
-        if (result.isEmpty()) {
-            throw new ProductoNotFoundException();
-        }
 
         return result.map(this::toResponse);
     }

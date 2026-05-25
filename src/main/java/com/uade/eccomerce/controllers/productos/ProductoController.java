@@ -59,8 +59,7 @@ public class ProductoController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductos(
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size)
-            throws ProductoNotFoundException {
+            @RequestParam(required = false) Integer size) {
         if (page == null || size == null) {
             return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(crearPageRequest(page, size))));
         }
@@ -116,7 +115,7 @@ public class ProductoController {
             @RequestParam List<Categoria> categorias,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
-            throws CategoriaInvalidaException, ProductoNotFoundException {
+            throws CategoriaInvalidaException {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categorías",
                 productoService.getProductosByCategorias(categorias, crearPageRequest(page, size))));
@@ -127,7 +126,7 @@ public class ProductoController {
             @RequestParam List<Seleccion> selecciones,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
-            throws SeleccionInvalidaException, ProductoNotFoundException {
+            throws SeleccionInvalidaException {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por selecciones",
                 productoService.getProductosBySelecciones(selecciones, crearPageRequest(page, size))));
@@ -152,7 +151,7 @@ public class ProductoController {
             @RequestParam String nombre,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
-            throws NombreInvalidoException, ProductoNotFoundException {
+            throws NombreInvalidoException {
         
         if (page == null || size == null)
             return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, crearPageRequest(page, size))));
