@@ -1,5 +1,6 @@
 package com.uade.eccomerce.service.producto;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.uade.eccomerce.controllers.productos.ProductoRequest;
 import com.uade.eccomerce.controllers.productos.ProductoResponse;
 import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
+import com.uade.eccomerce.entity.Seleccion;
 import com.uade.eccomerce.entity.Usuario;
 import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
@@ -21,6 +23,7 @@ import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.exceptions.productos.filtros.CategoriaInvalidaException;
 import com.uade.eccomerce.exceptions.productos.filtros.NombreInvalidoException;
 import com.uade.eccomerce.exceptions.productos.filtros.PrecioInvalidoException;
+import com.uade.eccomerce.exceptions.productos.filtros.SeleccionInvalidaException;
 import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.repository.ProductoRepository;
 import com.uade.eccomerce.repository.UsuarioRepository;
@@ -83,7 +86,9 @@ public class ProductoServiceImp implements ProductoService {
             .stock(producto.getStock())
             .disponible(producto.getStock() > 0 && producto.getActivo())
             .descuento(producto.getDescuento())
+            .destacado(producto.getDestacado())
             .categoria(producto.getCategoria())
+            .seleccion(producto.getSeleccion())
             .activo(producto.getActivo())
             // Mapeamos los datos del Usuario
             .idUsuario(producto.getUsuario() != null ? producto.getUsuario().getIdUsuario() : null)
@@ -156,7 +161,9 @@ public class ProductoServiceImp implements ProductoService {
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
         producto.setDescuento(request.getDescuento());
+        producto.setDestacado(request.getDestacado() != null ? request.getDestacado() : false);
         producto.setCategoria(request.getCategoria());
+        producto.setSeleccion(request.getSeleccion());
         producto.setActivo(true);
         producto.setUsuario(vendedor);
 
@@ -192,8 +199,14 @@ public class ProductoServiceImp implements ProductoService {
         productoExistente.setStock(request.getStock());
         productoExistente.setDescuento(request.getDescuento());
         productoExistente.setCategoria(request.getCategoria());
+        if (request.getDestacado() != null) {
+            productoExistente.setDestacado(request.getDestacado());
+        }
         if (request.getActivo() != null) {
             productoExistente.setActivo(request.getActivo());
+        }
+        if (request.getSeleccion() != null) {
+            productoExistente.setSeleccion(request.getSeleccion());
         }
 
         productoExistente.setUsuario(obtenerVendedorProducto(emailVendedor));
@@ -231,21 +244,28 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductoResponse> getProductosByCategoria(Categoria categoria, PageRequest pageable)
+    public Page<ProductoResponse> getProductosByCategorias(List<Categoria> categorias, PageRequest pageable)
         throws CategoriaInvalidaException, ProductoNotFoundException {
-        // Validar que la categoría no sea nula
-        if (categoria == null) {
+        if (categorias == null || categorias.isEmpty()) {
             throw new CategoriaInvalidaException();
         }
-
-        // Realizar la búsqueda
-        Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categoria, pageable);
-
-        // Validar si la página está vacía
+        Page<Producto> result = productoRepository.findByCategoriaAndActivoTrue(categorias, pageable);
         if (result.isEmpty()) {
             throw new ProductoNotFoundException();
         }
+        return result.map(this::toResponse);
+    }
 
+    @Transactional(readOnly = true)
+    public Page<ProductoResponse> getProductosBySelecciones(List<Seleccion> selecciones, PageRequest pageable)
+        throws SeleccionInvalidaException, ProductoNotFoundException {
+        if (selecciones == null || selecciones.isEmpty()) {
+            throw new SeleccionInvalidaException();
+        }
+        Page<Producto> result = productoRepository.findBySeleccionInAndActivoTrue(selecciones, pageable);
+        if (result.isEmpty()) {
+            throw new ProductoNotFoundException();
+        }
         return result.map(this::toResponse);
     }
 

@@ -2,7 +2,9 @@ package com.uade.eccomerce.entity;
 
 public enum Categoria {
     FIGURITAS,
-    ALBUNES,
-    COMBOS
+    ALBUMES,
+    COMBOS,
+    COCA_COLA,
+    EXTRA_STICKERS,
 }
 

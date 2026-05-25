@@ -45,8 +45,15 @@ public class Producto {
 
     // Relaciones
 
+    @Column(nullable = false)
+    private Boolean destacado = false; // Por defecto no destacado
+
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false) // Puede ser null si un combo o álbum no tiene selección específica
+    private Seleccion seleccion;
 
     @OneToMany(mappedBy = "producto")
     private List<DetallePedidos> detallePedidos;

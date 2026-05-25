@@ -71,6 +71,13 @@ public class PedidoServiceImp implements PedidoService {
         }
     }
 
+    private Double calcularPrecioUnitarioPedido(Producto producto) {
+        Double precio = producto.getPrecio() == null ? 0.0 : producto.getPrecio();
+        Integer descuento = producto.getDescuento() == null ? 0 : producto.getDescuento();
+
+        return (double) Math.round(precio * (1 - descuento / 100.0));
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public PedidoResponse crearPedido(PedidoRequest request, String emailComprador)
             throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
@@ -94,15 +101,17 @@ public class PedidoServiceImp implements PedidoService {
                 throw new StockInsuficienteException();
             }
 
+            Double precioUnitario = calcularPrecioUnitarioPedido(producto);
+
             DetallePedidos detalle = new DetallePedidos();
             detalle.setProducto(producto);
             detalle.setCantidad(item.getCantidad());
-            detalle.setPrecioUnitario(producto.getPrecio());
+            detalle.setPrecioUnitario(precioUnitario);
 
             producto.setStock(producto.getStock() - item.getCantidad());
             productoRepository.save(producto);
 
-            total += producto.getPrecio() * item.getCantidad();
+            total += precioUnitario * item.getCantidad();
 
             pedido.addDetalle(detalle);
         }

@@ -2,6 +2,8 @@ package com.uade.eccomerce.controllers.productos;
 
 import com.uade.eccomerce.controllers.imagenes.ImagenResponse;
 import com.uade.eccomerce.entity.Categoria;
+import com.uade.eccomerce.entity.Seleccion;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +23,9 @@ public class ProductoResponse {
     private Integer stock;
     private Boolean disponible;
     private Integer descuento;
+    private Boolean destacado;
     private Categoria categoria;
+    private Seleccion seleccion;
     private Boolean activo;
     
     private Long idUsuario;

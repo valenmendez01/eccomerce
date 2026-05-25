@@ -37,6 +37,7 @@ public class SecurityConfig {
 
                 // Categorías
                 .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll() // Público
+                .requestMatchers(HttpMethod.GET, "/selecciones/**").permitAll()
                 
                 // Configuración de Productos
                 .requestMatchers(HttpMethod.GET, "/usuarios/actual").authenticated()
