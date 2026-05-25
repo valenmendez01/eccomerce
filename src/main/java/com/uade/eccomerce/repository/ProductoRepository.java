@@ -2,6 +2,7 @@ package com.uade.eccomerce.repository;
 
 import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
+import com.uade.eccomerce.entity.Seleccion;
 
 import java.util.List;
 
@@ -24,6 +25,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Filtrar por multi-categorías
     @Query("SELECT p FROM Producto p WHERE p.categoria IN :categorias AND p.activo = true")
     Page<Producto> findByCategoriaAndActivoTrue(@Param("categorias") List<Categoria> categorias, PageRequest pageable);
+
+    // Filtrar por multi-selecciones
+    @Query("SELECT p FROM Producto p WHERE p.seleccion IN :selecciones AND p.activo = true")
+    Page<Producto> findBySeleccionInAndActivoTrue(@Param("selecciones") List<Seleccion> selecciones, PageRequest pageable);
 
     // Filtrar por rango de precio y que estén activos
     Page<Producto> findByPrecioBetweenAndActivoTrue(Double min, Double max, PageRequest pageable);
