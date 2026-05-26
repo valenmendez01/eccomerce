@@ -78,6 +78,14 @@ public class ProductoController {
                 productoService.getProductosDelVendedor(authentication == null ? null : authentication.getName(), pageable)));
     }
 
+    @GetMapping("/destacados")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosDestacados(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        return ResponseEntity.ok(new ApiResponse<>("Productos destacados obtenidos",
+                productoService.getProductosDestacados(crearPageRequest(page, size))));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductoResponse>> getProductoById(@PathVariable Long id) 
             throws ProductoIdInvalidoException, ProductoNotFoundException {

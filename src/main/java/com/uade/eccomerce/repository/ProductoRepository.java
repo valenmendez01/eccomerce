@@ -19,6 +19,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Listado de productos activos
     Page<Producto> findByActivoTrue(PageRequest pageable);
 
+    Page<Producto> findByDestacadoTrueAndActivoTrue(PageRequest pageable);
+
     // Verificar si existe un producto con el mismo nombre (para evitar duplicados)
     boolean existsByNombre(String nombre);
     
@@ -38,5 +40,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Page<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre, PageRequest pageable);
 
     Page<Producto> findByUsuarioEmail(String email, PageRequest pageable);
+
+    long countByDestacadoTrueAndActivoTrue();
 
 }
