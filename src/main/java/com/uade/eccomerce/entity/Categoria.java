@@ -6,5 +6,6 @@ public enum Categoria {
     COMBOS,
     COCA_COLA,
     EXTRA_STICKERS,
+    EXTRA_STICKER,
 }
 

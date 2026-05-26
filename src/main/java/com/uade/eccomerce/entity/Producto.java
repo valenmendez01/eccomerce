@@ -52,7 +52,7 @@ public class Producto {
     private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false) // Puede ser null si un combo o álbum no tiene selección específica
+    @Column(nullable = false)
     private Seleccion seleccion;
 
     @OneToMany(mappedBy = "producto")

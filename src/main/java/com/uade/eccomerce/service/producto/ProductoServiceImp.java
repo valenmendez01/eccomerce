@@ -30,6 +30,7 @@ import com.uade.eccomerce.repository.UsuarioRepository;
 
 @Service
 public class ProductoServiceImp implements ProductoService {
+    private static final int MAXIMO_CARACTERES_NOMBRE_PRODUCTO = 25;
     
     @Autowired
     private ProductoRepository productoRepository;
@@ -55,12 +56,20 @@ public class ProductoServiceImp implements ProductoService {
             throw new SolicitudInvalidaException("El nombre del producto es obligatorio.");
         }
 
+        if (request.getNombre().trim().length() > MAXIMO_CARACTERES_NOMBRE_PRODUCTO) {
+            throw new SolicitudInvalidaException("El nombre no puede superar 25 caracteres.");
+        }
+
         if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
             throw new SolicitudInvalidaException("La descripcion del producto es obligatoria.");
         }
 
         if (request.getCategoria() == null) {
             throw new SolicitudInvalidaException("La categoria del producto es obligatoria.");
+        }
+
+        if (request.getSeleccion() == null) {
+            throw new SolicitudInvalidaException("La seleccion del producto es obligatoria.");
         }
 
         if (request.getPrecio() == null || request.getPrecio() <= 0) {
