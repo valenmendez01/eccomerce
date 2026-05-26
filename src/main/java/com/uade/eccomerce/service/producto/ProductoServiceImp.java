@@ -279,7 +279,7 @@ public class ProductoServiceImp implements ProductoService {
         if (min == null || max == null || min < 0 || max < 0 || min > max) {
             throw new PrecioInvalidoException();
         }
-        Page<Producto> result = productoRepository.findByPrecioBetweenAndActivoTrue(min, max, pageable);
+        Page<Producto> result = productoRepository.findByPrecioConDescuentoBetweenAndActivoTrue(min, max, pageable);
         return result.map(this::toResponse);
     }
 
