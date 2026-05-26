@@ -31,7 +31,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Page<Producto> findBySeleccionInAndActivoTrue(@Param("selecciones") List<Seleccion> selecciones, PageRequest pageable);
 
     // Filtrar por rango de precio y que estén activos
-    Page<Producto> findByPrecioBetweenAndActivoTrue(Double min, Double max, PageRequest pageable);
+    @Query("SELECT p FROM Producto p WHERE (p.precio * (1 - p.descuento / 100.0)) BETWEEN :min AND :max AND p.activo = true")
+    Page<Producto> findByPrecioConDescuentoBetweenAndActivoTrue(@Param("min") Double min, @Param("max") Double max, PageRequest pageable);
     
     // Buscar por nombre (para el buscador del catálogo)
     Page<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre, PageRequest pageable);
