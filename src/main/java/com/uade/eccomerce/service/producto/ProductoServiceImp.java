@@ -31,6 +31,7 @@ import com.uade.eccomerce.repository.UsuarioRepository;
 @Service
 public class ProductoServiceImp implements ProductoService {
     private static final int MAXIMO_CARACTERES_NOMBRE_PRODUCTO = 25;
+    private static final int MAXIMO_PRODUCTOS_DESTACADOS = 4;
     
     @Autowired
     private ProductoRepository productoRepository;
@@ -85,6 +86,26 @@ public class ProductoServiceImp implements ProductoService {
         }
     }
 
+    private void validarLimiteDestacados(ProductoRequest request) {
+        if (Boolean.TRUE.equals(request.getDestacado())
+                && productoRepository.countByDestacadoTrueAndActivoTrue() >= MAXIMO_PRODUCTOS_DESTACADOS) {
+            throw new SolicitudInvalidaException("Ya existen 4 productos destacados. Desactiva uno antes de destacar otro.");
+        }
+    }
+
+    private void validarLimiteDestacados(Producto productoActual, ProductoRequest request) {
+        boolean destacadoActual = Boolean.TRUE.equals(productoActual.getDestacado());
+        boolean activoActual = Boolean.TRUE.equals(productoActual.getActivo());
+        boolean quedaDestacado = request.getDestacado() != null ? request.getDestacado() : destacadoActual;
+        boolean quedaActivo = request.getActivo() != null ? request.getActivo() : activoActual;
+        boolean yaContabaComoDestacado = destacadoActual && activoActual;
+
+        if (quedaDestacado && quedaActivo && !yaContabaComoDestacado
+                && productoRepository.countByDestacadoTrueAndActivoTrue() >= MAXIMO_PRODUCTOS_DESTACADOS) {
+            throw new SolicitudInvalidaException("Ya existen 4 productos destacados. Desactiva uno antes de destacar otro.");
+        }
+    }
+
     private ProductoResponse toResponse(Producto producto) {
         // Usamos el Builder que definiste en ProductoResponse
         return ProductoResponse.builder()
@@ -129,6 +150,11 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProductoResponse> getProductosDestacados(PageRequest pageable) {
+        return productoRepository.findByDestacadoTrueAndActivoTrue(pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException {
 
         // Validamos si el ID es nulo
@@ -151,6 +177,7 @@ public class ProductoServiceImp implements ProductoService {
     @Transactional(rollbackFor = Throwable.class)
     public ProductoResponse guardarProducto(ProductoRequest request, String emailVendedor) throws ProductoDuplicateException, UsuarioNotFoundException {
         validarProducto(request);
+        validarLimiteDestacados(request);
 
         // Validamos que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(request.getNombre())) {
@@ -168,7 +195,7 @@ public class ProductoServiceImp implements ProductoService {
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
         producto.setDescuento(request.getDescuento());
-        producto.setDestacado(request.getDestacado() != null ? request.getDestacado() : false);
+        producto.setDestacado(Boolean.TRUE.equals(request.getDestacado()));
         producto.setCategoria(request.getCategoria());
         producto.setSeleccion(request.getSeleccion());
         producto.setActivo(true);
@@ -198,6 +225,7 @@ public class ProductoServiceImp implements ProductoService {
 
         // Si existe, obtenemos el objeto
         Producto productoExistente = result.get();
+        validarLimiteDestacados(productoExistente, request);
 
         // Actualizamos los campos básicos desde el Request
         productoExistente.setNombre(request.getNombre());
@@ -207,7 +235,7 @@ public class ProductoServiceImp implements ProductoService {
         productoExistente.setDescuento(request.getDescuento());
         productoExistente.setCategoria(request.getCategoria());
         if (request.getDestacado() != null) {
-            productoExistente.setDestacado(request.getDestacado());
+            productoExistente.setDestacado(Boolean.TRUE.equals(request.getDestacado()));
         }
         if (request.getActivo() != null) {
             productoExistente.setActivo(request.getActivo());

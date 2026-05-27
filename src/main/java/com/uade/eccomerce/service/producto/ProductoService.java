@@ -22,6 +22,8 @@ public interface ProductoService {
 
     public Page<ProductoResponse> getProductos(PageRequest pageable);
 
+    public Page<ProductoResponse> getProductosDestacados(PageRequest pageable);
+
     public ProductoResponse getProductoById(Long id) throws ProductoIdInvalidoException, ProductoNotFoundException;
 
     public ProductoResponse guardarProducto(ProductoRequest request, String emailVendedor) throws ProductoDuplicateException, UsuarioNotFoundException;
