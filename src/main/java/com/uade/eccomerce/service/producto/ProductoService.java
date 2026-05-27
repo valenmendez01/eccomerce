@@ -44,4 +44,6 @@ public interface ProductoService {
 
     boolean tieneStock(Long id, Integer cantidadSolicitada) throws ProductoNotFoundException;
 
+    Page<ProductoResponse> getProductosByFiltros(String nombre, List<Categoria> categorias, List<Seleccion> selecciones, Double min, Double max, PageRequest pageable);
+
 }
