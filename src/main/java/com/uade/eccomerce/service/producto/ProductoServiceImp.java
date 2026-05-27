@@ -314,4 +314,15 @@ public class ProductoServiceImp implements ProductoService {
         return producto.getStock() >= cantidadSolicitada && producto.getActivo();
     }
 
+    @Transactional(readOnly = true)
+    public Page<ProductoResponse> getProductosByFiltros(String nombre, List<Categoria> categorias, List<Seleccion> selecciones, Double min, Double max, PageRequest pageable) {
+        Double minFinal = (min == null || min < 0) ? 0.0 : min;
+        Double maxFinal = (max == null || max < 0) ? Double.MAX_VALUE : max;
+        List<Categoria> cats = (categorias == null || categorias.isEmpty()) ? null : categorias;
+        List<Seleccion> sels = (selecciones == null || selecciones.isEmpty()) ? null : selecciones;
+        String nombreFinal = (nombre == null || nombre.isBlank()) ? null : nombre;
+
+        return productoRepository.findByFiltros(nombreFinal, cats, sels, minFinal, maxFinal, pageable).map(this::toResponse);
+    }
+
 }
