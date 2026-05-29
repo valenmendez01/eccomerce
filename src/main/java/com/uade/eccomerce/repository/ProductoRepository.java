@@ -41,6 +41,18 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     Page<Producto> findByUsuarioEmail(String email, PageRequest pageable);
 
+    @Query("SELECT p FROM Producto p WHERE p.activo = true " +
+       "AND (:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
+       "AND (:categorias IS NULL OR p.categoria IN :categorias) " +
+       "AND (:selecciones IS NULL OR p.seleccion IN :selecciones) " +
+       "AND (p.precio * (1 - p.descuento / 100.0)) BETWEEN :min AND :max")
+    Page<Producto> findByFiltros(
+        @Param("nombre") String nombre,
+        @Param("categorias") List<Categoria> categorias,
+        @Param("selecciones") List<Seleccion> selecciones,
+        @Param("min") Double min,
+        @Param("max") Double max,
+        PageRequest pageable);
     long countByDestacadoTrueAndActivoTrue();
 
 }

@@ -166,4 +166,18 @@ public class ProductoController {
         
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, crearPageRequest(page, size))));
     }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductosByFiltros(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) List<Categoria> categorias,
+            @RequestParam(required = false) List<Seleccion> selecciones,
+            @RequestParam(required = false) Double min,
+            @RequestParam(required = false) Double max,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados",
+                productoService.getProductosByFiltros(nombre, categorias, selecciones, min, max, crearPageRequest(page, size))));
+    }
 }
