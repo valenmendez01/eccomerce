@@ -31,6 +31,7 @@ import com.uade.eccomerce.repository.UsuarioRepository;
 @Service
 public class ProductoServiceImp implements ProductoService {
     private static final int MAXIMO_CARACTERES_NOMBRE_PRODUCTO = 25;
+    private static final int MAXIMO_STOCK_PRODUCTO = 10000;
     private static final int MAXIMO_PRODUCTOS_DESTACADOS = 4;
     
     @Autowired
@@ -79,6 +80,10 @@ public class ProductoServiceImp implements ProductoService {
 
         if (request.getStock() == null || request.getStock() < 0) {
             throw new SolicitudInvalidaException("El stock no puede ser negativo.");
+        }
+
+        if (request.getStock() > MAXIMO_STOCK_PRODUCTO) {
+            throw new SolicitudInvalidaException("El stock no puede superar 10000 unidades.");
         }
 
         if (request.getDescuento() == null || request.getDescuento() < 0 || request.getDescuento() > 100) {
