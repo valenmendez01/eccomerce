@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
@@ -19,16 +20,22 @@ public class EmailServiceImp implements EmailService {
     @Value("${spring.mail.username}")
     private String emailRemitente;
 
+    @Async
     public void enviarEmail(String destinatario, String asunto, String mensaje) {
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setFrom(emailRemitente);
-        email.setTo(destinatario);
-        email.setSubject(asunto);
-        email.setText(mensaje);
+        try {
+            SimpleMailMessage email = new SimpleMailMessage();
+            email.setFrom(emailRemitente);
+            email.setTo(destinatario);
+            email.setSubject(asunto);
+            email.setText(mensaje);
 
-        javaMailSender.send(email);
+            javaMailSender.send(email);
+        } catch (Exception e) {
+            System.err.println("No se pudo enviar el email a " + destinatario + ": " + e.getMessage());
+        }
     }
 
+    @Async
     public void enviarEmailHtml(String destinatario, String asunto, String html) {
         try {
             MimeMessage mensaje = javaMailSender.createMimeMessage();
@@ -42,7 +49,7 @@ public class EmailServiceImp implements EmailService {
 
             javaMailSender.send(mensaje);
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo enviar el email HTML.", e);
+            System.err.println("No se pudo enviar el email HTML a " + destinatario + ": " + e.getMessage());
         }
     }
 }
