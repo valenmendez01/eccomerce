@@ -54,6 +54,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/pedidos").hasAuthority(Rol.VENDEDOR.name())
                 .requestMatchers(HttpMethod.GET, "/ventas/vendedor").hasAuthority(Rol.VENDEDOR.name())
 
+                // Configuracion de pagos
+                .requestMatchers(HttpMethod.POST, "/pagos/paypal/**").hasAuthority(Rol.COMPRADOR.name())
+
                 // Cualquier otra ruta requiere estar autenticado
                 .anyRequest().authenticated()
             )
