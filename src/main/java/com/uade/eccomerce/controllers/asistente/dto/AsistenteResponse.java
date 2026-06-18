@@ -1,0 +1,16 @@
+package com.uade.eccomerce.controllers.asistente.dto;
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AsistenteResponse {
+    private String respuesta;
+    private List<AsistenteAction> acciones;
+    private Boolean fueraDeTema;
+}

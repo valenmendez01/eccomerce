@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 // Rutas públicas (Registro y Login)
                 .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/asistente/preguntar").permitAll()
 
                 // Categorías
                 .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll() // Público
