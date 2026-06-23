@@ -19,6 +19,8 @@ import com.uade.eccomerce.service.pedido.PedidoService;
 @RequestMapping("/ventas")
 public class VentasController {
 
+    private static final int TAMANIO_PAGINA_POR_DEFECTO = 100;
+
     @Autowired
     private PedidoService pedidoService;
 
@@ -28,7 +30,9 @@ public class VentasController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size)
             throws UsuarioNotFoundException {
-        PageRequest pageable = PageRequest.of(page == null ? 0 : page, size == null ? Integer.MAX_VALUE : size);
+        PageRequest pageable = PageRequest.of(
+                page == null ? 0 : page,
+                size == null ? TAMANIO_PAGINA_POR_DEFECTO : size);
 
         return ResponseEntity.ok(new ApiResponse<>("Ventas del vendedor obtenidas",
                 pedidoService.obtenerVentasDelVendedor(authentication == null ? null : authentication.getName(), pageable)));
