@@ -30,7 +30,7 @@ public interface ProductoService {
 
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, String emailVendedor) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException;
 
-    public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException;
+    public void eliminarProducto(Long id, String emailVendedor) throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException;
 
     public Page<ProductoResponse> getProductosDelVendedor(String email, PageRequest pageable);
 

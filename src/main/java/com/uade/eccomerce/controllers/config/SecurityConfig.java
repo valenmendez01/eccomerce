@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/productos/**").permitAll() // Público
                 .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
                 .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
+                .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority(Rol.VENDEDOR.name())
 
                 // Configuración de Pedidos
                 .requestMatchers(HttpMethod.POST, "/pedidos", "/pedidos/").hasAuthority(Rol.COMPRADOR.name())

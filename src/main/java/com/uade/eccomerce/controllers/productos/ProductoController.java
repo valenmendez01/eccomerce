@@ -1,8 +1,8 @@
 package com.uade.eccomerce.controllers.productos;
 
 import com.uade.eccomerce.controllers.ApiResponse;
+import com.uade.eccomerce.controllers.config.PaginacionUtils;
 import com.uade.eccomerce.entity.Categoria;
-import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
 import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
@@ -45,26 +45,15 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    private PageRequest crearPageRequest(Integer page, Integer size) {
-        int pagina = page == null ? 0 : page;
-        int tamanio = size == null ? Integer.MAX_VALUE : size;
-
-        if (pagina < 0 || tamanio <= 0) {
-            throw new SolicitudInvalidaException("La paginacion es invalida.");
-        }
-
-        return PageRequest.of(pagina, tamanio);
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductoResponse>>> getProductos(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         if (page == null || size == null) {
-            return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(crearPageRequest(page, size))));
+            return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PaginacionUtils.crear(page, size))));
         }
         
-        return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(crearPageRequest(page, size))));
+        return ResponseEntity.ok(new ApiResponse<>("Productos obtenidos con éxito", productoService.getProductos(PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/vendedor")
@@ -72,7 +61,7 @@ public class ProductoController {
             Authentication authentication,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
-        PageRequest pageable = crearPageRequest(page, size);
+        PageRequest pageable = PaginacionUtils.crear(page, size);
 
         return ResponseEntity.ok(new ApiResponse<>("Productos del vendedor obtenidos",
                 productoService.getProductosDelVendedor(authentication == null ? null : authentication.getName(), pageable)));
@@ -83,7 +72,7 @@ public class ProductoController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         return ResponseEntity.ok(new ApiResponse<>("Productos destacados obtenidos",
-                productoService.getProductosDestacados(crearPageRequest(page, size))));
+                productoService.getProductosDestacados(PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/{id}")
@@ -111,10 +100,14 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}/desactivar")
-    public ResponseEntity<ApiResponse<Void>> eliminarProducto(@PathVariable Long id)
-            throws ProductoNotFoundException, ProductoIdInvalidoException {
+    public ResponseEntity<ApiResponse<Void>> eliminarProducto(
+            @PathVariable Long id,
+            Authentication authentication)
+            throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
 
-        productoService.eliminarProducto(id);
+        productoService.eliminarProducto(
+                id,
+                authentication == null ? null : authentication.getName());
         return ResponseEntity.ok(new ApiResponse<>("Producto eliminado correctamente", null));
     }
 
@@ -126,7 +119,7 @@ public class ProductoController {
             throws CategoriaInvalidaException {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por categorías",
-                productoService.getProductosByCategorias(categorias, crearPageRequest(page, size))));
+                productoService.getProductosByCategorias(categorias, PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/filtrar/selecciones")
@@ -137,7 +130,7 @@ public class ProductoController {
             throws SeleccionInvalidaException {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por selecciones",
-                productoService.getProductosBySelecciones(selecciones, crearPageRequest(page, size))));
+                productoService.getProductosBySelecciones(selecciones, PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/filtrar/precio")
@@ -149,9 +142,9 @@ public class ProductoController {
             throws PrecioInvalidoException {
         
         if (page == null || size == null)
-            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, crearPageRequest(page, size))));
+            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, PaginacionUtils.crear(page, size))));
         
-        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, crearPageRequest(page, size))));
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por precio", productoService.getProductosByPrecio(min, max, PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/filtrar/nombre")
@@ -162,9 +155,9 @@ public class ProductoController {
             throws NombreInvalidoException {
         
         if (page == null || size == null)
-            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, crearPageRequest(page, size))));
+            return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, PaginacionUtils.crear(page, size))));
         
-        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, crearPageRequest(page, size))));
+        return ResponseEntity.ok(new ApiResponse<>("Productos filtrados por nombre", productoService.getProductosByNombre(nombre, PaginacionUtils.crear(page, size))));
     }
 
     @GetMapping("/filtrar")
@@ -178,6 +171,6 @@ public class ProductoController {
             @RequestParam(required = false) Integer size) {
 
         return ResponseEntity.ok(new ApiResponse<>("Productos filtrados",
-                productoService.getProductosByFiltros(nombre, categorias, selecciones, min, max, crearPageRequest(page, size))));
+                productoService.getProductosByFiltros(nombre, categorias, selecciones, min, max, PaginacionUtils.crear(page, size))));
     }
 }

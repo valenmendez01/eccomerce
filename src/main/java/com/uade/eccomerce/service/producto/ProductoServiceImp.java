@@ -16,6 +16,7 @@ import com.uade.eccomerce.entity.Categoria;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.entity.Seleccion;
 import com.uade.eccomerce.entity.Usuario;
+import com.uade.eccomerce.exceptions.AccesoProductoNoAutorizadoException;
 import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
 import com.uade.eccomerce.exceptions.productos.ProductoDuplicateException;
 import com.uade.eccomerce.exceptions.productos.ProductoIdInvalidoException;
@@ -31,7 +32,8 @@ import com.uade.eccomerce.repository.UsuarioRepository;
 @Service
 public class ProductoServiceImp implements ProductoService {
     private static final int MAXIMO_CARACTERES_NOMBRE_PRODUCTO = 25;
-    private static final int MAXIMO_STOCK_PRODUCTO = 10000;
+    private static final int MAXIMO_STOCK_PRODUCTO = 99999;
+    private static final double MAXIMO_PRECIO_PRODUCTO = 99999999.0;
     private static final int MAXIMO_PRODUCTOS_DESTACADOS = 4;
     
     @Autowired
@@ -47,6 +49,24 @@ public class ProductoServiceImp implements ProductoService {
 
         return usuarioRepository.findByEmail(emailVendedor)
                 .orElseThrow(UsuarioNotFoundException::new);
+    }
+
+    private Producto obtenerProductoDelVendedor(Long id, String emailVendedor)
+            throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
+        if (id == null) {
+            throw new ProductoIdInvalidoException();
+        }
+
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(ProductoNotFoundException::new);
+        Usuario vendedor = obtenerVendedorProducto(emailVendedor);
+
+        if (producto.getUsuario() == null
+                || !vendedor.getIdUsuario().equals(producto.getUsuario().getIdUsuario())) {
+            throw new AccesoProductoNoAutorizadoException();
+        }
+
+        return producto;
     }
 
     private void validarProducto(ProductoRequest request) {
@@ -78,12 +98,16 @@ public class ProductoServiceImp implements ProductoService {
             throw new SolicitudInvalidaException("El precio debe ser mayor a cero.");
         }
 
+        if (request.getPrecio() > MAXIMO_PRECIO_PRODUCTO) {
+            throw new SolicitudInvalidaException("El precio no puede superar 99999999.");
+        }
+
         if (request.getStock() == null || request.getStock() < 0) {
             throw new SolicitudInvalidaException("El stock no puede ser negativo.");
         }
 
         if (request.getStock() > MAXIMO_STOCK_PRODUCTO) {
-            throw new SolicitudInvalidaException("El stock no puede superar 10000 unidades.");
+            throw new SolicitudInvalidaException("El stock no puede superar 99999 unidades.");
         }
 
         if (request.getDescuento() == null || request.getDescuento() < 0 || request.getDescuento() > 100) {
@@ -214,22 +238,7 @@ public class ProductoServiceImp implements ProductoService {
     @Transactional(rollbackFor = Throwable.class)
     public ProductoResponse actualizarProducto(Long id, ProductoRequest request, String emailVendedor) throws ProductoIdInvalidoException, ProductoNotFoundException, UsuarioNotFoundException {
         validarProducto(request);
-
-        // Validamos nulidad del ID
-        if (id == null) {
-            throw new ProductoIdInvalidoException();
-        }
-
-        // Buscamos el producto por ID
-        Optional<Producto> result = productoRepository.findById(id);
-
-        // Validamos que exista
-        if (!result.isPresent()) {
-            throw new ProductoNotFoundException();
-        }
-
-        // Si existe, obtenemos el objeto
-        Producto productoExistente = result.get();
+        Producto productoExistente = obtenerProductoDelVendedor(id, emailVendedor);
         validarLimiteDestacados(productoExistente, request);
 
         // Actualizamos los campos básicos desde el Request
@@ -249,33 +258,16 @@ public class ProductoServiceImp implements ProductoService {
             productoExistente.setSeleccion(request.getSeleccion());
         }
 
-        productoExistente.setUsuario(obtenerVendedorProducto(emailVendedor));
-
         // Guardamos los cambios
         return toResponse(productoRepository.save(productoExistente));
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void eliminarProducto(Long id) throws ProductoNotFoundException, ProductoIdInvalidoException {
-        // Validamos nulidad del ID
-        if (id == null) {
-            throw new ProductoIdInvalidoException();
-        }
-    
-        // Buscamos el producto por ID
-        Optional<Producto> result = productoRepository.findById(id);
-
-        // Validamos que exista
-        if (!result.isPresent()) {
-            throw new ProductoNotFoundException();
-        }
-
-        // Obtenemos el objeto
-        Producto p = result.get();
-
-        // Realizamos la baja lógica
-        p.setActivo(false);
-        productoRepository.save(p);
+    public void eliminarProducto(Long id, String emailVendedor)
+            throws ProductoNotFoundException, ProductoIdInvalidoException, UsuarioNotFoundException {
+        Producto producto = obtenerProductoDelVendedor(id, emailVendedor);
+        producto.setActivo(false);
+        productoRepository.save(producto);
     }
 
     @Transactional(readOnly = true)

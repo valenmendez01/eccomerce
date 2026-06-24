@@ -41,6 +41,10 @@ public class OpenAiSolicitudBuilder {
         - Para seleccion, usa el nombre de una seleccion disponible del contexto.
         - Para acciones de pais o seleccion, usa solo filtro.seleccion. No agregues categoria FIGURITAS,
           salvo que el usuario pida literalmente solo figuritas individuales.
+        - Usa historialConversacion para interpretar respuestas breves como aceptaciones, rechazos,
+          referencias o elecciones sobre el mensaje anterior.
+        - Si el usuario acepta una propuesta anterior, continua exactamente esa propuesta y conserva
+          la accion ofrecida. No reinicies la conversacion ni hagas una pregunta general.
         - Si no corresponde accion, devolve acciones como lista vacia.
         - No escribas JSON dentro del campo respuesta. El campo respuesta es solo texto visible.
         """.formatted(AsistenteRespuestaLocalService.RESPUESTA_FUERA_DE_TEMA);
