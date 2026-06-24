@@ -15,14 +15,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.uade.eccomerce.controllers.pedidos.ItemRequest;
 import com.uade.eccomerce.controllers.pagos.PaypalCapturaResponse;
 import com.uade.eccomerce.controllers.pagos.PaypalCrearOrdenRequest;
 import com.uade.eccomerce.controllers.pagos.PaypalOrdenResponse;
+import com.uade.eccomerce.entity.Producto;
+import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
+import com.uade.eccomerce.repository.ProductoRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class PaypalService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ProductoRepository productoRepository;
 
     @Value("${paypal.client-id}")
     private String clientId;
@@ -41,7 +49,7 @@ public class PaypalService {
 
     public PaypalOrdenResponse crearOrden(PaypalCrearOrdenRequest request) {
         String accessToken = obtenerAccessToken();
-        String total = convertirPesosADolares(request.getTotalPesos());
+        String total = convertirPesosADolares(calcularTotalPesos(request.getItems()));
 
         Map<String, Object> body = Map.of(
             "intent", "CAPTURE",
@@ -123,8 +131,33 @@ public class PaypalService {
         );
     }
 
-    private String convertirPesosADolares(Double totalPesos) {
-        if (totalPesos == null || totalPesos <= 0) {
+    private double calcularTotalPesos(List<ItemRequest> items) {
+        if (items == null || items.isEmpty()) {
+            throw new SolicitudInvalidaException("El pago debe tener al menos un producto.");
+        }
+
+        return items.stream()
+            .mapToDouble((item) -> calcularSubtotalItem(item))
+            .sum();
+    }
+
+    private double calcularSubtotalItem(ItemRequest item) {
+        if (item == null || item.getIdProducto() == null || item.getCantidad() == null || item.getCantidad() <= 0) {
+            throw new SolicitudInvalidaException("Los items del pago son invalidos.");
+        }
+
+        Producto producto = productoRepository.findById(item.getIdProducto())
+            .orElseThrow(() -> new SolicitudInvalidaException("Uno de los productos del pago no existe."));
+
+        double precio = producto.getPrecio() == null ? 0 : producto.getPrecio();
+        int descuento = producto.getDescuento() == null ? 0 : producto.getDescuento();
+        double precioFinal = Math.round(precio * (1 - descuento / 100.0));
+
+        return precioFinal * item.getCantidad();
+    }
+
+    private String convertirPesosADolares(double totalPesos) {
+        if (totalPesos <= 0) {
             throw new IllegalArgumentException("El total del pago debe ser mayor a cero.");
         }
 
