@@ -8,7 +8,9 @@ import com.uade.eccomerce.exceptions.imagenes.ImagenNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 
 public interface ImagenService {
-    void agregarImagenesAProducto(Long idProducto, List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException;
+    void agregarImagenesAProducto(Long idProducto, List<MultipartFile> archivos, String emailVendedor)
+            throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException;
 
-    void eliminarImagen(Long idImagen) throws ImagenNotFoundException;
+    void eliminarImagen(Long idProducto, Long idImagen, String emailVendedor)
+            throws ImagenNotFoundException, ProductoNotFoundException;
 }

@@ -16,8 +16,6 @@ public interface PedidoService {
 
     PedidoResponse crearPedido(PedidoRequest request, String emailComprador) throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException;
 
-    Page<PedidoResponse> obtenerTodosLosPedidos(PageRequest pageable) throws PedidoNotFoundException;
-
     Page<PedidoResponse> obtenerPedidosDelComprador(String emailComprador, PageRequest pageable) throws UsuarioNotFoundException;
 
     Page<PedidoResponse> obtenerVentasDelVendedor(String emailVendedor, PageRequest pageable) throws UsuarioNotFoundException;

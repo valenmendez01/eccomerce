@@ -297,16 +297,6 @@ public class PedidoServiceImp implements PedidoService {
         return HtmlUtils.htmlEscape(texto == null ? "" : texto);
     }
 
-    public Page<PedidoResponse> obtenerTodosLosPedidos(PageRequest pageable) throws PedidoNotFoundException {
-        Page<Pedido> pedidos = pedidoRepository.findAll(pageable);
-
-        if (pedidos.isEmpty()) {
-            throw new PedidoNotFoundException();
-        }
-
-        return pedidos.map(this::convertirAResponse);
-    }
-
     @Transactional(readOnly = true)
     public Page<PedidoResponse> obtenerPedidosDelComprador(String emailComprador, PageRequest pageable) throws UsuarioNotFoundException {
         Usuario usuario = obtenerUsuarioPorEmail(emailComprador);
@@ -344,6 +334,7 @@ public class PedidoServiceImp implements PedidoService {
         return pedidos.map(this::convertirAResponse);
     }
 
+    @Transactional(readOnly = true)
     public PedidoResponse obtenerPedidoPorId(Long id, String emailUsuario, boolean esVendedor) throws PedidoIdInvalidoException, PedidoNotFoundException {
         if (id == null) {
             throw new PedidoIdInvalidoException();
@@ -356,7 +347,23 @@ public class PedidoServiceImp implements PedidoService {
         }
 
         Pedido pedidoEncontrado = pedido.get();
-        if (!esVendedor && !pedidoEncontrado.getUsuario().getEmail().equals(emailUsuario)) {
+        if (esVendedor) {
+            boolean vendedorParticipa = pedidoEncontrado.getDetallePedidos() != null
+                    && pedidoEncontrado.getDetallePedidos().stream()
+                            .anyMatch(detalle -> detalle.getProducto() != null
+                                    && detalle.getProducto().getUsuario() != null
+                                    && emailUsuario != null
+                                    && emailUsuario.equals(detalle.getProducto().getUsuario().getEmail()));
+
+            if (!vendedorParticipa) {
+                throw new AccesoPedidoNoAutorizadoException();
+            }
+
+            return convertirAResponse(pedidoEncontrado, emailUsuario);
+        }
+
+        if (emailUsuario == null
+                || !pedidoEncontrado.getUsuario().getEmail().equals(emailUsuario)) {
             throw new AccesoPedidoNoAutorizadoException();
         }
 

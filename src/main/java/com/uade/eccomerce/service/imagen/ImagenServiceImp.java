@@ -1,7 +1,6 @@
 package com.uade.eccomerce.service.imagen;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -12,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.uade.eccomerce.entity.ImagenProductos;
 import com.uade.eccomerce.entity.Producto;
+import com.uade.eccomerce.exceptions.AccesoProductoNoAutorizadoException;
 import com.uade.eccomerce.exceptions.imagenes.ImagenNotFoundException;
 import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
 import com.uade.eccomerce.repository.ImagenRepository;
@@ -33,14 +33,27 @@ public class ImagenServiceImp implements ImagenService {
         return nombreSeguro.length() > 255 ? nombreSeguro.substring(0, 255) : nombreSeguro;
     }
 
-    @Transactional(rollbackFor = Throwable.class)
-    public void agregarImagenesAProducto(Long idProducto, List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
-        
-        Optional<Producto> result = productoRepository.findById(idProducto);
-        if (result.isEmpty()) {
-            throw new ProductoNotFoundException();
+    private Producto obtenerProductoDelVendedor(Long idProducto, String emailVendedor)
+            throws ProductoNotFoundException {
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(ProductoNotFoundException::new);
+
+        if (emailVendedor == null
+                || producto.getUsuario() == null
+                || !emailVendedor.equals(producto.getUsuario().getEmail())) {
+            throw new AccesoProductoNoAutorizadoException();
         }
-        Producto producto = result.get();
+
+        return producto;
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    public void agregarImagenesAProducto(
+            Long idProducto,
+            List<MultipartFile> archivos,
+            String emailVendedor)
+            throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
+        Producto producto = obtenerProductoDelVendedor(idProducto, emailVendedor);
 
         // Iteramos sobre la lista de archivos (imagenes)
         for (MultipartFile archivo : archivos) {
@@ -55,12 +68,17 @@ public class ImagenServiceImp implements ImagenService {
     }
 
     @Transactional(rollbackFor = Throwable.class)
-    public void eliminarImagen(Long idImagen) throws ImagenNotFoundException {
-        Optional<ImagenProductos> result = imagenRepository.findById(idImagen);
-        if (result.isEmpty()) {
+    public void eliminarImagen(Long idProducto, Long idImagen, String emailVendedor)
+            throws ImagenNotFoundException, ProductoNotFoundException {
+        obtenerProductoDelVendedor(idProducto, emailVendedor);
+
+        ImagenProductos imagen = imagenRepository.findById(idImagen)
+                .orElseThrow(ImagenNotFoundException::new);
+        if (imagen.getProducto() == null
+                || !idProducto.equals(imagen.getProducto().getIdProducto())) {
             throw new ImagenNotFoundException();
         }
 
-        imagenRepository.deleteById(idImagen);
+        imagenRepository.delete(imagen);
     }
 }

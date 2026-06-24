@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,16 +37,26 @@ public class ImagenController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> subirImagenes(
             @PathVariable Long idProducto,
-            @RequestParam("archivos") List<MultipartFile> archivos) throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
-        imagenService.agregarImagenesAProducto(idProducto, archivos);
+            @RequestParam("archivos") List<MultipartFile> archivos,
+            Authentication authentication)
+            throws ProductoNotFoundException, java.io.IOException, java.sql.SQLException {
+        imagenService.agregarImagenesAProducto(
+                idProducto,
+                archivos,
+                authentication == null ? null : authentication.getName());
         return ResponseEntity.ok(new ApiResponse<>("Imágenes subidas correctamente", null));
     }
 
     @DeleteMapping("/{idImagen}")
     public ResponseEntity<ApiResponse<Void>> eliminarImagen(
             @PathVariable Long idProducto, 
-            @PathVariable Long idImagen) throws ImagenNotFoundException {
-        imagenService.eliminarImagen(idImagen);
+            @PathVariable Long idImagen,
+            Authentication authentication)
+            throws ImagenNotFoundException, ProductoNotFoundException {
+        imagenService.eliminarImagen(
+                idProducto,
+                idImagen,
+                authentication == null ? null : authentication.getName());
         return ResponseEntity.ok(new ApiResponse<>("Imagen eliminada correctamente", null));
     }
 }
