@@ -15,13 +15,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
+import com.uade.eccomerce.controllers.pedidos.PedidoResponse;
 import com.uade.eccomerce.controllers.pedidos.ItemRequest;
 import com.uade.eccomerce.controllers.pagos.PaypalCapturaResponse;
 import com.uade.eccomerce.controllers.pagos.PaypalCrearOrdenRequest;
 import com.uade.eccomerce.controllers.pagos.PaypalOrdenResponse;
 import com.uade.eccomerce.entity.Producto;
 import com.uade.eccomerce.exceptions.SolicitudInvalidaException;
+import com.uade.eccomerce.exceptions.productos.ProductoNotFoundException;
+import com.uade.eccomerce.exceptions.productos.StockInsuficienteException;
+import com.uade.eccomerce.exceptions.usuarios.UsuarioNotFoundException;
 import com.uade.eccomerce.repository.ProductoRepository;
+import com.uade.eccomerce.service.pedido.PedidoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +37,7 @@ public class PaypalService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ProductoRepository productoRepository;
+    private final PedidoService pedidoService;
 
     @Value("${paypal.client-id}")
     private String clientId;
@@ -79,17 +86,32 @@ public class PaypalService {
     }
 
     public PaypalCapturaResponse capturarOrden(String orderId) {
-        String accessToken = obtenerAccessToken();
-        Map<?, ?> response = restTemplate.postForObject(
-            baseUrl + "/v2/checkout/orders/" + orderId + "/capture",
-            new HttpEntity<>(Map.of(), crearHeadersBearer(accessToken)),
-            Map.class
-        );
+        Map<?, ?> response = capturarOrdenPaypal(orderId);
 
         return new PaypalCapturaResponse(
             String.valueOf(response.get("id")),
             String.valueOf(response.get("status"))
         );
+    }
+
+    public PedidoResponse confirmarPedidoPaypal(String orderId, PedidoRequest request, String emailComprador)
+            throws UsuarioNotFoundException, ProductoNotFoundException, StockInsuficienteException {
+        if (orderId == null || orderId.isBlank()) {
+            throw new SolicitudInvalidaException("La orden de PayPal es invalida.");
+        }
+
+        String totalEsperado = convertirPesosADolares(calcularTotalPesos(request.getItems()));
+        Map<?, ?> response = capturarOrdenPaypal(orderId);
+
+        if (!"COMPLETED".equals(response.get("status"))) {
+            throw new SolicitudInvalidaException("PayPal no marco el pago como completado.");
+        }
+
+        if (!mismoMonto(totalEsperado, obtenerMontoCapturado(response))) {
+            throw new SolicitudInvalidaException("El monto pagado no coincide con el total del pedido.");
+        }
+
+        return pedidoService.crearPedido(request, emailComprador);
     }
 
     private synchronized String obtenerAccessToken() {
@@ -124,6 +146,15 @@ public class PaypalService {
         return headers;
     }
 
+    private Map<?, ?> capturarOrdenPaypal(String orderId) {
+        String accessToken = obtenerAccessToken();
+        return restTemplate.postForObject(
+            baseUrl + "/v2/checkout/orders/" + orderId + "/capture",
+            new HttpEntity<>(Map.of(), crearHeadersBearer(accessToken)),
+            Map.class
+        );
+    }
+
     private String obtenerCredencialesBase64() {
         String credenciales = clientId + ":" + clientSecret;
         return Base64.getEncoder().encodeToString(
@@ -149,6 +180,10 @@ public class PaypalService {
         Producto producto = productoRepository.findById(item.getIdProducto())
             .orElseThrow(() -> new SolicitudInvalidaException("Uno de los productos del pago no existe."));
 
+        if (producto.getStock() == null || producto.getStock() < item.getCantidad()) {
+            throw new SolicitudInvalidaException("No hay stock suficiente para uno de los productos.");
+        }
+
         double precio = producto.getPrecio() == null ? 0 : producto.getPrecio();
         int descuento = producto.getDescuento() == null ? 0 : producto.getDescuento();
         double precioFinal = Math.round(precio * (1 - descuento / 100.0));
@@ -165,6 +200,27 @@ public class PaypalService {
             .divide(pesosPorDolar, 2, RoundingMode.HALF_UP)
             .max(BigDecimal.valueOf(1))
             .toPlainString();
+    }
+
+    private boolean mismoMonto(String esperado, String pagado) {
+        return new BigDecimal(esperado).compareTo(new BigDecimal(pagado)) == 0;
+    }
+
+    private String obtenerMontoCapturado(Map<?, ?> response) {
+        List<?> purchaseUnits = (List<?>) response.get("purchase_units");
+
+        return purchaseUnits.stream()
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast)
+            .map((unit) -> (Map<?, ?>) unit.get("payments"))
+            .map((payments) -> (List<?>) payments.get("captures"))
+            .flatMap(List::stream)
+            .filter(Map.class::isInstance)
+            .map(Map.class::cast)
+            .map((capture) -> (Map<?, ?>) capture.get("amount"))
+            .map((amount) -> String.valueOf(amount.get("value")))
+            .findFirst()
+            .orElseThrow(() -> new SolicitudInvalidaException("PayPal no devolvio el monto capturado."));
     }
 
     private String obtenerApprovalUrl(Map<?, ?> response) {
