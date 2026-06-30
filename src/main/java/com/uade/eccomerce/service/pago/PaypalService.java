@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import com.uade.eccomerce.controllers.pedidos.PedidoRequest;
 import com.uade.eccomerce.controllers.pedidos.PedidoResponse;
 import com.uade.eccomerce.controllers.pedidos.ItemRequest;
-import com.uade.eccomerce.controllers.pagos.PaypalCapturaResponse;
 import com.uade.eccomerce.controllers.pagos.PaypalCrearOrdenRequest;
 import com.uade.eccomerce.controllers.pagos.PaypalOrdenResponse;
 import com.uade.eccomerce.entity.Producto;
@@ -82,15 +81,6 @@ public class PaypalService {
             String.valueOf(response.get("status")),
             "USD",
             total
-        );
-    }
-
-    public PaypalCapturaResponse capturarOrden(String orderId) {
-        Map<?, ?> response = capturarOrdenPaypal(orderId);
-
-        return new PaypalCapturaResponse(
-            String.valueOf(response.get("id")),
-            String.valueOf(response.get("status"))
         );
     }
 

@@ -30,11 +30,6 @@ public class PaypalController {
         return paypalService.crearOrden(request);
     }
 
-    @PostMapping("/capturar-orden/{orderId}")
-    public PaypalCapturaResponse capturarOrden(@PathVariable String orderId) {
-        return paypalService.capturarOrden(orderId);
-    }
-
     @PostMapping("/confirmar-pedido/{orderId}")
     public ResponseEntity<ApiResponse<PedidoResponse>> confirmarPedido(
             @PathVariable String orderId,
